@@ -12,7 +12,7 @@ export function ProgressBar({
   unlockCount,
 }: ProgressBarProps) {
   return (
-    <div className="max-w-[600px] mx-auto w-full">
+    <div className="max-w-xl mx-auto w-full">
       <div className="h-1 bg-card rounded-full overflow-hidden relative">
         <div
           className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-[width] duration-500 ease-out"

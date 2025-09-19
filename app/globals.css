@@ -27,6 +27,9 @@
   --secondary: var(--accent-purple);
   --warning: var(--accent-yellow);
 
+  /* Shadow colors */
+  --shadow-primary: 0 10px 40px hsl(var(--accent-cyan) / 0.3);
+
   /* Typography */
   --font-inter: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 
@@ -68,6 +71,9 @@
   --color-warning: hsl(var(--warning));
   --color-accent-cyan-transparent: hsl(var(--accent-cyan-transparent));
   --color-accent-purple-transparent: hsl(var(--accent-purple-transparent));
+
+  /* Shadows */
+  --shadow-primary: var(--shadow-primary);
 
   /* Typography */
   --font-sans: var(--font-inter), var(--font-geist-sans);

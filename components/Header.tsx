@@ -19,7 +19,7 @@ const NavLink = ({
   >
     {children}
     {isActive && (
-      <span className="absolute -bottom-[29px] left-0 right-0 h-px bg-primary" />
+      <span className="absolute -bottom-7 left-0 right-0 h-px bg-primary" />
     )}
   </Link>
 );
@@ -33,7 +33,7 @@ export function Header() {
           href="/"
           className="flex items-center gap-3 text-lg font-semibold tracking-tighter"
         >
-          <div className="h-8 w-8 rounded-[8px] bg-gradient-to-br from-primary to-secondary opacity-90" />
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary opacity-90" />
           Size Battle
         </Link>
 
@@ -52,7 +52,7 @@ export function Header() {
           {/* Score display */}
           <div className="flex items-center gap-6 border-r border-border pr-6">
             <div className="flex flex-col items-end">
-              <span className="mb-1 text-[11px] uppercase tracking-[0.1em] text-foreground-tertiary">
+              <span className="mb-1 text-xs uppercase tracking-widest text-foreground-tertiary">
                 Streak
               </span>
               <span className="bg-gradient-to-br from-primary to-secondary bg-clip-text text-lg font-semibold text-transparent">
@@ -60,7 +60,7 @@ export function Header() {
               </span>
             </div>
             <div className="flex flex-col items-end">
-              <span className="mb-1 text-[11px] uppercase tracking-[0.1em] text-foreground-tertiary">
+              <span className="mb-1 text-xs uppercase tracking-widest text-foreground-tertiary">
                 Score
               </span>
               <span className="bg-gradient-to-br from-primary to-secondary bg-clip-text text-lg font-semibold text-transparent">

@@ -24,7 +24,7 @@ export default function Home() {
   const handleHeavier = () => console.log("Heavier selected");
 
   return (
-    <div className="flex flex-1 flex-col px-12 py-15 max-w-[1400px] w-full mx-auto">
+    <div className="flex flex-1 flex-col px-12 py-16 max-w-screen-2xl  w-full mx-auto">
       <CategoryBadge category="animals" />
 
       <VSArena
