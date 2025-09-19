@@ -1,56 +1,78 @@
 "use client";
 
-import { ProgressBar } from "@/components/ProgressBar";
-import { CategoryBadge } from "@/components/CategoryBadge";
-import { VSArena } from "@/components/VSArena";
-import { ActionPanel } from "@/components/ActionPanel";
-import { usePokemonData } from "@/hooks/usePokemonData";
-import { useEffect } from "react";
+import { useState } from "react";
+import { ComparatorView } from "@/components/ComparatorView";
 
 export default function Home() {
-  const { data, isLoading, isError } = usePokemonData(50); // Hardcoded size for now
+  const [showPokemon, setShowPokemon] = useState(true);
+  const [showArt, setShowArt] = useState(true);
 
-  useEffect(() => {
-    if (data) {
-      console.log("Fetched data:", data);
-    }
-    if (isError) {
-      console.error("Error fetching data:", isError);
-    }
-  }, [data, isError]);
+  // Generate individual gradient opacities for smooth fade transitions
+  const getPokemonOpacity = () => {
+    if (showPokemon && !showArt) return 1; // Only Pokemon active
+    if (showPokemon && showArt) return 1; // Both active (for dual gradient)
+    return 0; // Pokemon inactive
+  };
 
-  const handleLighter = () => console.log("Lighter selected");
-  const handleEqual = () => console.log("Equal selected");
-  const handleHeavier = () => console.log("Heavier selected");
+  const getArtOpacity = () => {
+    if (showArt && !showPokemon) return 1; // Only Art active
+    if (showPokemon && showArt) return 1; // Both active (for dual gradient)
+    return 0; // Art inactive
+  };
+
+  const getDualGradientOpacity = () => {
+    return showPokemon && showArt ? 1 : 0; // Only show dual gradient when both active
+  };
+
+  const handleToggleChange = (pokemon: boolean, art: boolean) => {
+    setShowPokemon(pokemon);
+    setShowArt(art);
+  };
 
   return (
-    <div className="flex flex-1 flex-col px-12 py-16 max-w-screen-2xl  w-full mx-auto">
-      <CategoryBadge category="animals" />
+    <div className="relative flex flex-1 flex-col">
+      {/* Layered Background Gradients with Individual Fade Transitions */}
 
-      <VSArena
-        leftCard={{
-          emoji: "🐘",
-          title: "African Elephant",
-          subtitle: "Average adult weight",
-          value: "6,000 kg",
-          isRevealed: true,
-        }}
-        rightCard={{
-          emoji: "🦏",
-          title: "White Rhinoceros",
-          subtitle: "Average adult weight",
-          value: "2,300 kg",
-          isRevealed: false,
+      {/* Pokemon Radial Gradient Layer */}
+      <div
+        className="fixed inset-0 transition-opacity duration-500 ease-in-out"
+        style={{
+          zIndex: -3,
+          background:
+            "radial-gradient(ellipse at center, transparent 20%, rgba(239,68,68,0.06) 60%, rgba(239,68,68,0.12) 100%)",
+          boxShadow: "inset 0 0 120px rgba(239,68,68,0.08)",
+          opacity: showPokemon && !showArt ? getPokemonOpacity() : 0,
         }}
       />
 
-      <ActionPanel
-        onLighter={handleLighter}
-        onEqual={handleEqual}
-        onHeavier={handleHeavier}
+      {/* Art Radial Gradient Layer */}
+      <div
+        className="fixed inset-0 transition-opacity duration-500 ease-in-out"
+        style={{
+          zIndex: -3,
+          background:
+            "radial-gradient(ellipse at center, transparent 20%, rgba(59,130,246,0.12) 60%, rgba(59,130,246,0.18) 100%)",
+          boxShadow: "inset 0 0 120px rgba(59,130,246,0.14)",
+          opacity: showArt && !showPokemon ? getArtOpacity() : 0,
+        }}
       />
 
-      <ProgressBar current={13} total={20} progress={65} unlockCount={7} />
+      {/* Dual Linear Gradient Layer (Both active) */}
+      <div
+        className="fixed inset-0 transition-opacity duration-500 ease-in-out"
+        style={{
+          zIndex: -2,
+          background:
+            "linear-gradient(to right, rgba(239,68,68,0.08), transparent, rgba(59,130,246,0.12))",
+          boxShadow:
+            "inset 40px 0 80px -40px rgba(239,68,68,0.08), inset -40px 0 80px -40px rgba(59,130,246,0.12)",
+          opacity: getDualGradientOpacity(),
+        }}
+      />
+
+      <div className="relative z-10 flex flex-1 flex-col px-12 py-16 max-w-screen-2xl w-full mx-auto">
+        <ComparatorView onToggleChange={handleToggleChange} />
+      </div>
     </div>
   );
 }

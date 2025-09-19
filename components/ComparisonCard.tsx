@@ -27,7 +27,7 @@ export function ComparisonCard({
   return (
     <div className={`${perspectiveClass}`}>
       <div
-        className={`h-[420px] bg-card border border-border rounded-3xl p-12 flex flex-col justify-between transition-all duration-300 ease-out relative overflow-hidden group hover:bg-card-hover hover:border-border-subtle ${hoverTransform}`}
+        className={`h-[420px] bg-card backdrop-blur-xs border border-border rounded-3xl p-12 flex flex-col justify-between transition-all duration-300 ease-out relative overflow-hidden group hover:bg-card-hover hover:border-border-subtle ${hoverTransform}`}
       >
         {/* Subtle top border gradient */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border-subtle to-transparent" />

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { User } from "lucide-react";
 
 const NavLink = ({
@@ -25,48 +26,78 @@ const NavLink = ({
 );
 
 export function Header() {
+  const pathname = usePathname();
+
   return (
     <header className="sticky top-0 z-50 h-20 border-b border-border bg-background/80 backdrop-blur-lg">
       <div className="flex h-full items-center justify-between px-12">
-        {/* Logo section */}
-        <Link
-          href="/"
-          className="flex items-center gap-3 text-lg font-semibold tracking-tighter"
-        >
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary opacity-90" />
-          Size Battle
-        </Link>
+        
+        <div className="flex items-center gap-10">
+          {/* Logo section */}
+          <Link
+            href="/"
+            className="flex items-center gap-3 text-lg font-semibold tracking-tighter"
+          >
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary opacity-90" />
+            Størrémon
+          </Link>
 
-        {/* Navigation section */}
-        <nav className="flex gap-10">
-          <NavLink href="#" isActive>
-            Classic
-          </NavLink>
-          <NavLink href="#">Accuracy</NavLink>
-          <NavLink href="#">Time Rush</NavLink>
-          <NavLink href="#">Tournament</NavLink>
-        </nav>
+          {/* Navigation section */}
+          <nav className="flex gap-10">
+            <NavLink href="/" isActive={pathname === "/"}>
+              Explorer
+            </NavLink>
+            <NavLink href="/game" isActive={pathname === "/game"}>
+              Game
+            </NavLink>
+          </nav>
+        </div>
 
         {/* Actions section */}
         <div className="flex items-center gap-8">
-          {/* Score display */}
-          <div className="flex items-center gap-6 border-r border-border pr-6">
-            <div className="flex flex-col items-end">
-              <span className="mb-1 text-xs uppercase tracking-widest text-foreground-tertiary">
-                Streak
-              </span>
-              <span className="bg-gradient-to-br from-primary to-secondary bg-clip-text text-lg font-semibold text-transparent">
-                12
-              </span>
-            </div>
-            <div className="flex flex-col items-end">
-              <span className="mb-1 text-xs uppercase tracking-widest text-foreground-tertiary">
-                Score
-              </span>
-              <span className="bg-gradient-to-br from-primary to-secondary bg-clip-text text-lg font-semibold text-transparent">
-                2,450
-              </span>
-            </div>
+          {/* Contextual Widget */}
+          <div className="flex items-center justify-end gap-6 border-r border-border pr-6 w-48 md:w-64 lg:w-80">
+            {pathname === "/game" ? (
+              // Game Mode: Show Streak & Score
+              <>
+                <div className="flex flex-col items-end">
+                  <span className="mb-1 text-xs uppercase tracking-widest text-foreground-tertiary">
+                    Streak
+                  </span>
+                  <span className="bg-gradient-to-br from-primary to-secondary bg-clip-text text-lg font-semibold text-transparent">
+                    12
+                  </span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="mb-1 text-xs uppercase tracking-widest text-foreground-tertiary">
+                    Score
+                  </span>
+                  <span className="bg-gradient-to-br from-primary to-secondary bg-clip-text text-lg font-semibold text-transparent">
+                    2,450
+                  </span>
+                </div>
+              </>
+            ) : (
+              // Explorer Mode: Show Data Stats
+              <>
+                <div className="flex flex-col items-end">
+                  <span className="mb-1 text-xs uppercase tracking-widest text-foreground-tertiary">
+                    Pokémon
+                  </span>
+                  <span className="bg-gradient-to-br from-red-500 to-red-600 bg-clip-text text-lg font-semibold text-transparent">
+                    1,010
+                  </span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="mb-1 text-xs uppercase tracking-widest text-foreground-tertiary">
+                    Artifacts
+                  </span>
+                  <span className="bg-gradient-to-br from-blue-500 to-blue-600 bg-clip-text text-lg font-semibold text-transparent">
+                    12,450
+                  </span>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Profile button */}
