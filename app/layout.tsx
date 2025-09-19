@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Scale Explorer",
+  title: "Størrémon",
   description: "An interactive app to explore relative sizes",
 };
 
