@@ -23,6 +23,7 @@ export function VSArena({ leftCard, rightCard }: VSArenaProps) {
         subtitle={leftCard.subtitle}
         value={leftCard.value}
         isRevealed={leftCard.isRevealed}
+        position="left"
       />
 
       <VSSeparator />
@@ -33,6 +34,7 @@ export function VSArena({ leftCard, rightCard }: VSArenaProps) {
         subtitle={rightCard.subtitle}
         value={rightCard.value}
         isRevealed={rightCard.isRevealed}
+        position="right"
       />
     </div>
   );

@@ -33,7 +33,7 @@ export default function Home() {
           title: "African Elephant",
           subtitle: "Average adult weight",
           value: "6,000 kg",
-          isRevealed: false,
+          isRevealed: true,
         }}
         rightCard={{
           emoji: "🦏",

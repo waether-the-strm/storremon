@@ -11,12 +11,15 @@
 
   /* Card and surface colors */
   --card: 0 0% 100% / 0.02; /* rgba(255,255,255,0.02) */
+  --card-hover: 0 0% 100% / 0.03; /* rgba(255,255,255,0.03) */
   --border: 0 0% 100% / 0.06; /* rgba(255,255,255,0.06) */
   --border-subtle: 0 0% 100% / 0.1; /* rgba(255,255,255,0.1) */
 
   /* Accent colors */
   --accent-cyan: 198 100% 50%; /* #00d9ff */
+  --accent-cyan-transparent: 198 100% 50% / 0.1; /* rgba(0,217,255,0.1) */
   --accent-purple: 262 80% 63%; /* #a855f7 */
+  --accent-purple-transparent: 262 80% 63% / 0.1; /* rgba(168,85,247,0.1) */
   --accent-yellow: 48 95% 64%; /* #fcd34d */
 
   /* Semantic colors */
@@ -56,12 +59,15 @@
   --color-foreground-tertiary: hsl(var(--foreground-tertiary));
 
   --color-card: hsl(var(--card));
+  --color-card-hover: hsl(var(--card-hover));
   --color-border: hsl(var(--border));
   --color-border-subtle: hsl(var(--border-subtle));
 
   --color-primary: hsl(var(--primary));
   --color-secondary: hsl(var(--secondary));
   --color-warning: hsl(var(--warning));
+  --color-accent-cyan-transparent: hsl(var(--accent-cyan-transparent));
+  --color-accent-purple-transparent: hsl(var(--accent-purple-transparent));
 
   /* Typography */
   --font-sans: var(--font-inter), var(--font-geist-sans);
@@ -103,4 +109,17 @@ body {
   background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px),
     linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
   background-size: 100px 100px;
+}
+
+/* 3D transforms for cards */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.hover\:rotate-y-\[-8deg\]:hover {
+  transform: translateY(-4px) rotateY(-8deg) rotateX(2deg);
+}
+
+.hover\:rotate-y-\[8deg\]:hover {
+  transform: translateY(-4px) rotateY(8deg) rotateX(2deg);
 }
