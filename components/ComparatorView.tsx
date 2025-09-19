@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ComparisonCard } from "./ComparisonCard";
 import { ScaleSlider } from "./ScaleSlider";
 import { ToggleButtonGroup } from "./ToggleButtonGroup";
@@ -17,6 +18,15 @@ export function ComparatorView({
   const [showPokemon, setShowPokemon] = useState(true);
   const [showArt, setShowArt] = useState(true);
   const [sliderValue, setSliderValue] = useState(50);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  const scale = useTransform(scrollYProgress, [0, 0.1], [1, 0.9]);
+  const opacity = useTransform(scrollYProgress, [0, 0.1], [1, 0.1]);
 
   // Notify parent about initial toggle state
   useEffect(() => {
@@ -66,28 +76,28 @@ export function ComparatorView({
     },
   ];
 
-const handleToggle = (optionId: string) => {
-  const isPokemon = optionId === "pokemon";
-  const isArt = optionId === "art";
+  const handleToggle = (optionId: string) => {
+    const isPokemon = optionId === "pokemon";
+    const isArt = optionId === "art";
 
-  if (isPokemon || isArt) {
-    const [currentShow, otherShow, setCurrentShow, setOtherShow] = isPokemon
-      ? [showPokemon, showArt, setShowPokemon, setShowArt]
-      : [showArt, showPokemon, setShowArt, setShowPokemon];
+    if (isPokemon || isArt) {
+      const [currentShow, otherShow, setCurrentShow, setOtherShow] = isPokemon
+        ? [showPokemon, showArt, setShowPokemon, setShowArt]
+        : [showArt, showPokemon, setShowArt, setShowPokemon];
 
-    if (currentShow && !otherShow) {
-      setCurrentShow(false);
-      setOtherShow(true);
-      onToggleChange?.(!currentShow, !otherShow);
-    } else if (currentShow && otherShow) {
-      setCurrentShow(false);
-      onToggleChange?.(!currentShow, otherShow);
-    } else {
-      setCurrentShow(true);
-      onToggleChange?.(currentShow, !otherShow);
+      if (currentShow && !otherShow) {
+        setCurrentShow(false);
+        setOtherShow(true);
+        onToggleChange?.(!currentShow, !otherShow);
+      } else if (currentShow && otherShow) {
+        setCurrentShow(false);
+        onToggleChange?.(!currentShow, otherShow);
+      } else {
+        setCurrentShow(true);
+        onToggleChange?.(currentShow, !otherShow);
+      }
     }
-  }
-};
+  };
 
   const toggleOptions = [
     { id: "pokemon", label: "Pokémon", color: "red" as const },
@@ -100,8 +110,11 @@ const handleToggle = (optionId: string) => {
   ];
 
   return (
-    <div className={`flex flex-col space-y-8 ${className}`}>
-      <div className="sticky top-24 flex flex-col items-center space-y-4 mb-16">
+    <div ref={containerRef} className={`flex flex-col space-y-8 ${className}`}>
+      <motion.div
+        className="sticky top-36 flex flex-col items-center space-y-4 mb-16"
+        style={{ scale, opacity }}
+      >
         <h1 className="text-3xl font-bold text-center">Størrémon</h1>
         {/* Category Toggle Header */}
         <div className="flex flex-col items-center space-y-4 mb-16 gap-8">
@@ -120,11 +133,8 @@ const handleToggle = (optionId: string) => {
         {/* Scale Slider */}
         <div className="w-full max-w-4xl mx-auto">
           <ScaleSlider />
-          <div className="mt-2 text-center text-sm text-gray-500">
-            Current size: {sliderValue}% scale
-          </div>
         </div>
-      </div>
+      </motion.div>
       {/* Two-panel Layout */}
       <div
         className={`grid gap-8 ${

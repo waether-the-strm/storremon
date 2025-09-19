@@ -211,3 +211,80 @@ body {
   box-shadow: 0 0 15px rgba(251, 191, 36, 0.3),
     0 0 30px rgba(251, 191, 36, 0.15);
 }
+
+/* Custom Slider Styling */
+.slider-custom {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  border-radius: 9999px;
+  outline: none;
+  background-color: #374151; /* Dark fallback background for dark mode */
+}
+
+.slider-custom::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 36px;
+  height: 36px;
+  background: radial-gradient(
+      circle at center center,
+      #f3f4f6 12%,
+      #1f2937 13%,
+      #1f2937 18%,
+      transparent 19%
+    ),
+    linear-gradient(
+      to bottom,
+      #ef4444 0%,
+      #ef4444 47%,
+      #1f2937 47%,
+      #1f2937 53%,
+      #f3f4f6 53%,
+      #f3f4f6 100%
+    );
+  border: 3px solid #1f2937;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4), 0 0 20px rgba(239, 68, 68, 0.2);
+  transition: all 0.2s ease;
+  position: relative;
+  transform: rotate(-15deg);
+}
+
+.slider-custom::-webkit-slider-thumb:hover {
+  transform: rotate(-15deg) scale(1.15);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.6), 0 0 30px rgba(239, 68, 68, 0.3);
+}
+
+.slider-custom::-moz-range-thumb {
+  width: 36px;
+  height: 36px;
+  background: radial-gradient(
+      circle at center center,
+      #f3f4f6 12%,
+      #1f2937 13%,
+      #1f2937 18%,
+      transparent 19%
+    ),
+    linear-gradient(
+      to bottom,
+      #ef4444 0%,
+      #ef4444 47%,
+      #1f2937 47%,
+      #1f2937 53%,
+      #f3f4f6 53%,
+      #f3f4f6 100%
+    );
+  border: 3px solid #1f2937;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4), 0 0 20px rgba(239, 68, 68, 0.2);
+  transition: all 0.2s ease;
+  transform: rotate(-15deg);
+}
+
+.slider-custom::-moz-range-thumb:hover {
+  transform: rotate(-15deg) scale(1.15);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.6), 0 0 30px rgba(239, 68, 68, 0.3);
+}
