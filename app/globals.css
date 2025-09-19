@@ -1,18 +1,121 @@
 @import "tailwindcss";
 
+/* Base design tokens - will be mapped to Tailwind classes */
 :root {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
+  /* Colors - Dark mode as primary */
+  --background: 240 4% 4%; /* #0a0a0b */
+  --background-secondary: 240 4% 7%; /* #111113 */
+  --foreground: 0 0% 100%; /* #ffffff */
+  --foreground-secondary: 0 0% 60%; /* rgba(255,255,255,0.6) */
+  --foreground-tertiary: 0 0% 40%; /* rgba(255,255,255,0.4) */
+
+  /* Card and surface colors */
+  --card: 0 0% 100% / 0.02; /* rgba(255,255,255,0.02) */
+  --border: 0 0% 100% / 0.06; /* rgba(255,255,255,0.06) */
+  --border-subtle: 0 0% 100% / 0.1; /* rgba(255,255,255,0.1) */
+
+  /* Accent colors */
+  --accent-cyan: 198 100% 50%; /* #00d9ff */
+  --accent-purple: 262 80% 63%; /* #a855f7 */
+  --accent-yellow: 48 95% 64%; /* #fcd34d */
+
+  /* Semantic colors */
+  --primary: var(--accent-cyan);
+  --secondary: var(--accent-purple);
+  --warning: var(--accent-yellow);
+
+  /* Typography */
+  --font-inter: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Spacing and sizing */
+  --header-height: 5rem; /* 80px */
+  --card-radius: 1.5rem; /* 24px */
+  --button-radius: 1rem; /* 16px */
 }
 
+/* Light mode override (for future use) */
+.light {
+  --background: 0 0% 100%; /* white */
+  --background-secondary: 0 0% 96%; /* light gray */
+  --foreground: 240 10% 3.9%; /* dark */
+  --foreground-secondary: 240 5% 40%; /* gray */
+  --foreground-tertiary: 240 5% 60%; /* light gray */
+
+  --card: 0 0% 0% / 0.02; /* rgba(0,0,0,0.02) */
+  --border: 0 0% 0% / 0.06; /* rgba(0,0,0,0.06) */
+  --border-subtle: 0 0% 0% / 0.1; /* rgba(0,0,0,0.1) */
+}
+
+/* Map CSS variables to Tailwind theme */
 @theme {
+  /* Colors */
   --color-background: hsl(var(--background));
+  --color-background-secondary: hsl(var(--background-secondary));
   --color-foreground: hsl(var(--foreground));
-  --font-sans: var(--font-geist-sans);
+  --color-foreground-secondary: hsl(var(--foreground-secondary));
+  --color-foreground-tertiary: hsl(var(--foreground-tertiary));
+
+  --color-card: hsl(var(--card));
+  --color-border: hsl(var(--border));
+  --color-border-subtle: hsl(var(--border-subtle));
+
+  --color-primary: hsl(var(--primary));
+  --color-secondary: hsl(var(--secondary));
+  --color-warning: hsl(var(--warning));
+
+  /* Typography */
+  --font-sans: var(--font-inter), var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Custom spacing */
+  --spacing-header: var(--header-height);
+
+  /* Border radius */
+  --radius-card: var(--card-radius);
+  --radius-button: var(--button-radius);
+  --radius-full: 9999px;
 }
 
+/* Global styles */
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
+  font-family: var(--font-inter), var(--font-geist-sans);
+  overflow-x: hidden;
+}
+
+/* Gradient background overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+      circle at 20% 50%,
+      hsl(var(--accent-cyan) / 0.05) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 50%,
+      hsl(var(--accent-purple) / 0.05) 0%,
+      transparent 50%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Decorative grid overlay */
+.decoration-grid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
+  background-size: 100px 100px;
+  pointer-events: none;
+  z-index: 1;
 }
