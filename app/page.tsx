@@ -1,6 +1,6 @@
 "use client";
 
-import { ScaleSlider } from "@/components/ScaleSlider";
+import { ProgressBar } from "@/components/ProgressBar";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { VSArena } from "@/components/VSArena";
 import { ActionPanel } from "@/components/ActionPanel";
@@ -50,11 +50,7 @@ export default function Home() {
         onHeavier={handleHeavier}
       />
 
-      {/* Scale Slider - keeping for now */}
-      <section id="scale-slider">
-        <h2 className="sr-only">Scale Slider</h2>
-        <ScaleSlider />
-      </section>
+      <ProgressBar current={13} total={20} progress={65} unlockCount={7} />
     </div>
   );
 }
