@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { size: string } }
+  { params }: { params: Promise<{ size: string }> }
 ) {
-  const size = params.size;
+  const { size } = await params;
   // Placeholder data
   const data = {
     size,
