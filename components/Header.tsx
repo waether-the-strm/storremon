@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { User } from "lucide-react";
 
 const NavLink = ({
   href,
@@ -70,17 +71,7 @@ export function Header() {
 
           {/* Profile button */}
           <button className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition-all hover:scale-105 hover:bg-white/5">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
+            <User size={20} />
           </button>
         </div>
       </div>
