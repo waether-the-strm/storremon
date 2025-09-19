@@ -3,38 +3,34 @@
 import { useState, useRef } from "react";
 
 interface ScaleSliderProps {
-  value?: number;
-  onChange?: (value: number) => void;
+  value: number;
+  onChange: (value: number) => void;
   className?: string;
 }
 
 export function ScaleSlider({
-  value: controlledValue,
+  value,
   onChange,
   className = "",
 }: ScaleSliderProps) {
-  const [internalValue, setInternalValue] = useState(50);
   const [isHovering, setIsHovering] = useState(false);
-  const value = controlledValue ?? internalValue;
 
   const handleChange = (newValue: number) => {
-    setInternalValue(newValue);
-    onChange?.(newValue);
+    onChange(newValue);
   };
 
   // Convert slider value (0-100) to real size units
   const valueToSize = (val: number) => {
-    // Exponential scale: 0-100 maps to 0.1cm - 100m
+    // Exponential scale: 0-100 maps to 0.1cm - 30m
     const minLog = Math.log(0.1); // 0.1cm
-    const maxLog = Math.log(10000); // 100m = 10000cm
+    const maxLog = Math.log(3000); // 30m = 3000cm
     const logValue = minLog + (val / 100) * (maxLog - minLog);
     const sizeInCm = Math.exp(logValue);
 
     if (sizeInCm < 100) {
       return `${sizeInCm.toFixed(1)}cm`;
-    } else {
-      return `${(sizeInCm / 100).toFixed(1)}m`;
     }
+    return `${(sizeInCm / 100).toFixed(2)}m`;
   };
 
   // Generate density heatmap as full background gradient
@@ -96,9 +92,10 @@ export function ScaleSlider({
   };
 
   const getScaleLabel = (val: number) => {
-    const sizeInCm = Math.exp(
-      Math.log(0.1) + (val / 100) * (Math.log(10000) - Math.log(0.1))
-    );
+    const minLog = Math.log(0.1); // 0.1cm
+    const maxLog = Math.log(3000); // 30m = 3000cm
+    const logValue = minLog + (val / 100) * (maxLog - minLog);
+    const sizeInCm = Math.exp(logValue);
 
     if (sizeInCm < 1) return "Microscopic";
     if (sizeInCm < 50) return "Tiny";

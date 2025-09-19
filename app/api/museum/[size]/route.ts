@@ -100,6 +100,45 @@ const fetchArtifactDetails = async (
   }
 };
 
+// --- In-Memory Cache using Singleton Pattern ---
+
+let artifactCache: FormattedArtifact[] | null = null;
+let isFetching = false;
+let fetchPromise: Promise<void> | null = null;
+
+const fetchAndCacheArtifacts = async (): Promise<void> => {
+  if (isFetching && fetchPromise) {
+    return fetchPromise;
+  }
+  isFetching = true;
+
+  fetchPromise = (async () => {
+    try {
+      console.log("Fetching and caching all artifacts...");
+      const objectIDs = await getSculptureObjectIDs();
+      if (objectIDs.length > 0) {
+        const allArtifacts = await processInBatches(
+          objectIDs,
+          fetchArtifactDetails,
+          50
+        );
+        artifactCache = allArtifacts;
+        console.log(`Successfully cached ${allArtifacts.length} artifacts.`);
+      } else {
+        artifactCache = [];
+      }
+    } catch (error) {
+      console.error("Failed to fetch and cache artifacts:", error);
+      artifactCache = []; // Cache an empty array on failure to prevent retries
+    } finally {
+      isFetching = false;
+      fetchPromise = null;
+    }
+  })();
+
+  return fetchPromise;
+};
+
 // --- API ROUTE HANDLER ---
 
 export async function GET(
@@ -116,42 +155,25 @@ export async function GET(
       );
     }
 
-    const objectIDs = await getSculptureObjectIDs();
-    if (!objectIDs.length) {
-      return NextResponse.json(
-        { size: sizeNum, artifacts: [], count: 0 },
-        {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Cache-Control": "public, max-age=3600, s-maxage=86400",
-          },
-        }
-      );
+    // If cache is empty, populate it.
+    if (artifactCache === null) {
+      await fetchAndCacheArtifacts();
     }
 
-    const allArtifacts = await processInBatches(
-      objectIDs,
-      fetchArtifactDetails,
-      50
-    );
+    // Now, filter from the cache.
+    const filteredArtifacts =
+      artifactCache?.filter((a) => a.height === sizeNum) ?? [];
 
-    const filteredArtifacts = allArtifacts.filter((a) => a.height === sizeNum);
-
-    return NextResponse.json(
-      {
-        size: sizeNum,
-        artifacts: filteredArtifacts,
-        count: filteredArtifacts.length,
+    // The response in the original code returns the wrong object shape.
+    // The client expects an array of artifacts directly.
+    return NextResponse.json(filteredArtifacts, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Cache-Control": "public, max-age=3600, s-maxage=86400", // Let browser cache filtered result
       },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Cache-Control": "public, max-age=3600, s-maxage=86400",
-        },
-      }
-    );
+    });
   } catch (error) {
     console.error("[API_MUSEUM_ERROR]", error);
     return NextResponse.json(

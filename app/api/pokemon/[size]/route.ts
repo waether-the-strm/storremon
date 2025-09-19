@@ -94,6 +94,35 @@ async function getAllPokemon(): Promise<FormattedPokemon[]> {
   return allPokemonDetails;
 }
 
+// --- In-Memory Cache for Pokemon ---
+let pokemonCache: FormattedPokemon[] | null = null;
+let isFetchingPokemon = false;
+let pokemonFetchPromise: Promise<void> | null = null;
+
+const fetchAndCachePokemon = async (): Promise<void> => {
+  if (isFetchingPokemon && pokemonFetchPromise) {
+    return pokemonFetchPromise;
+  }
+  isFetchingPokemon = true;
+
+  pokemonFetchPromise = (async () => {
+    try {
+      console.log("Fetching and caching all Pokémon...");
+      const allPokemon = await getAllPokemon();
+      pokemonCache = allPokemon;
+      console.log(`Successfully cached ${allPokemon.length} Pokémon.`);
+    } catch (error) {
+      console.error("Failed to fetch and cache Pokémon:", error);
+      pokemonCache = [];
+    } finally {
+      isFetchingPokemon = false;
+      pokemonFetchPromise = null;
+    }
+  })();
+
+  return pokemonFetchPromise;
+};
+
 // --- API ROUTE HANDLER ---
 
 export async function GET(
@@ -116,24 +145,22 @@ export async function GET(
       );
     }
 
-    const allPokemon = await getAllPokemon();
-    const filteredPokemon = allPokemon.filter((p) => p.height === sizeNum);
+    if (pokemonCache === null) {
+      await fetchAndCachePokemon();
+    }
 
-    return NextResponse.json(
-      {
-        size: sizeNum,
-        pokemon: filteredPokemon,
-        count: filteredPokemon.length,
+    const filteredPokemon =
+      pokemonCache?.filter((p) => p.height === sizeNum) ?? [];
+
+    // Return the array of pokemon directly, as expected by the client
+    return NextResponse.json(filteredPokemon, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Cache-Control": "public, max-age=3600, s-maxage=86400", // 1h browser, 24h CDN
       },
-      {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Cache-Control": "public, max-age=3600, s-maxage=86400", // 1h browser, 24h CDN
-        },
-      }
-    );
+    });
   } catch (error) {
     console.error("[API_POKEMON_ERROR]", error);
     return NextResponse.json(

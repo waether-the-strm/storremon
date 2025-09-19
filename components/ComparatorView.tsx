@@ -5,6 +5,31 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ComparisonCard } from "./ComparisonCard";
 import { ScaleSlider } from "./ScaleSlider";
 import { ToggleButtonGroup } from "./ToggleButtonGroup";
+import { useDebounce } from "../hooks/useDebounce";
+
+export interface Pokemon {
+  name: string;
+  height: number; // in decimeters
+  imageUrl: string;
+  types: string[];
+}
+
+export interface Art {
+  title: string;
+  artist: string;
+  date: string;
+  height: number; // in cm
+  imageUrl: string;
+}
+
+// It's better to have this utility function outside or passed as a prop
+// if it's needed in multiple places. For now, let's define it here.
+const valueToSizeCm = (val: number): number => {
+  const minLog = Math.log(0.1); // 0.1cm
+  const maxLog = Math.log(3000); // 30m = 3000cm, increased range
+  const logValue = minLog + (val / 100) * (maxLog - minLog);
+  return Math.exp(logValue);
+};
 
 interface ComparatorViewProps {
   className?: string;
@@ -18,6 +43,57 @@ export function ComparatorView({
   const [showPokemon, setShowPokemon] = useState(true);
   const [showArt, setShowArt] = useState(true);
   const [sliderValue, setSliderValue] = useState(50);
+  const debouncedSliderValue = useDebounce(sliderValue, 300); // 300ms delay
+
+  const [pokemonData, setPokemonData] = useState<Pokemon[]>([]);
+  const [artData, setArtData] = useState<Art[]>([]);
+  const [isPokemonLoading, setIsPokemonLoading] = useState(false);
+  const [isArtLoading, setIsArtLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const sizeInCm = valueToSizeCm(debouncedSliderValue);
+
+      if (showPokemon) {
+        setIsPokemonLoading(true);
+        try {
+          // Pokemon height is in decimeters, so we convert cm to dm
+          const sizeInDm = Math.round(sizeInCm / 10);
+          const response = await fetch(`/api/pokemon/${sizeInDm}`);
+          if (!response.ok) throw new Error("Network response was not ok");
+          const data = await response.json();
+          setPokemonData(data);
+        } catch (error) {
+          console.error("Failed to fetch Pokemon data:", error);
+          setPokemonData([]); // Clear data on error
+        } finally {
+          setIsPokemonLoading(false);
+        }
+      } else {
+        setPokemonData([]);
+      }
+
+      if (showArt) {
+        setIsArtLoading(true);
+        try {
+          const size = Math.round(sizeInCm);
+          const response = await fetch(`/api/museum/${size}`);
+          if (!response.ok) throw new Error("Network response was not ok");
+          const data = await response.json();
+          setArtData(data);
+        } catch (error) {
+          console.error("Failed to fetch Art data:", error);
+          setArtData([]); // Clear data on error
+        } finally {
+          setIsArtLoading(false);
+        }
+      } else {
+        setArtData([]);
+      }
+    };
+
+    fetchData();
+  }, [debouncedSliderValue, showPokemon, showArt]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -32,49 +108,6 @@ export function ComparatorView({
   useEffect(() => {
     onToggleChange?.(showPokemon, showArt);
   }, []);
-
-  // Mock data for now - will be replaced with real data in TASK-009
-  const mockPokemonData = [
-    {
-      emoji: "🐛",
-      title: "Caterpie",
-      subtitle: "Worm Pokémon",
-      value: "0.3m",
-    },
-    {
-      emoji: "🦋",
-      title: "Butterfree",
-      subtitle: "Butterfly Pokémon",
-      value: "1.1m",
-    },
-    {
-      emoji: "🐭",
-      title: "Pikachu",
-      subtitle: "Mouse Pokémon",
-      value: "0.4m",
-    },
-  ];
-
-  const mockArtData = [
-    {
-      emoji: "🗿",
-      title: "Roman Sculpture",
-      subtitle: "Metropolitan Museum",
-      value: "1.2m",
-    },
-    {
-      emoji: "🏺",
-      title: "Greek Vase",
-      subtitle: "Ancient Pottery",
-      value: "0.5m",
-    },
-    {
-      emoji: "🎭",
-      title: "Theater Mask",
-      subtitle: "Classical Art",
-      value: "0.3m",
-    },
-  ];
 
   const handleToggle = (optionId: string) => {
     const isPokemon = optionId === "pokemon";
@@ -132,7 +165,7 @@ export function ComparatorView({
 
         {/* Scale Slider */}
         <div className="w-full max-w-4xl mx-auto">
-          <ScaleSlider />
+          <ScaleSlider value={sliderValue} onChange={setSliderValue} />
         </div>
       </motion.div>
       {/* Two-panel Layout */}
@@ -148,16 +181,24 @@ export function ComparatorView({
               Pokémon
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {mockPokemonData.map((pokemon, index) => (
-                <ComparisonCard
-                  key={`pokemon-${index}`}
-                  emoji={pokemon.emoji}
-                  title={pokemon.title}
-                  subtitle={pokemon.subtitle}
-                  value={pokemon.value}
-                  isRevealed={true}
-                />
-              ))}
+              {isPokemonLoading ? (
+                <p className="text-center col-span-full">Loading Pokémon...</p>
+              ) : pokemonData.length > 0 ? (
+                pokemonData.map((pokemon) => (
+                  <ComparisonCard
+                    key={pokemon.name}
+                    imageUrl={pokemon.imageUrl}
+                    title={pokemon.name}
+                    subtitle={pokemon.types.join(", ")}
+                    value={`${pokemon.height / 10}m`}
+                    isRevealed={true}
+                  />
+                ))
+              ) : (
+                <p className="text-center col-span-full">
+                  No Pokémon found at this size.
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -169,23 +210,30 @@ export function ComparatorView({
               Museum Artifacts
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {mockArtData.map((art, index) => (
-                <ComparisonCard
-                  key={`art-${index}`}
-                  emoji={art.emoji}
-                  title={art.title}
-                  subtitle={art.subtitle}
-                  value={art.value}
-                  isRevealed={true}
-                />
-              ))}
+              {isArtLoading ? (
+                <p className="text-center col-span-full">
+                  Loading Artifacts...
+                </p>
+              ) : artData.length > 0 ? (
+                artData.map((art) => (
+                  <ComparisonCard
+                    key={art.title}
+                    imageUrl={art.imageUrl}
+                    title={art.title}
+                    subtitle={art.artist}
+                    value={`${art.height}cm`}
+                    isRevealed={true}
+                  />
+                ))
+              ) : (
+                <p className="text-center col-span-full">
+                  No artifacts found at this size.
+                </p>
+              )}
             </div>
           </div>
         )}
       </div>
-
-      {/* Loading State Placeholder for future */}
-      {/* Will be implemented in TASK-009 */}
     </div>
   );
 }

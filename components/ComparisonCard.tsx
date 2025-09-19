@@ -1,5 +1,5 @@
 interface ComparisonCardProps {
-  emoji: string;
+  imageUrl: string;
   title: string;
   subtitle: string;
   value?: string | number;
@@ -8,7 +8,7 @@ interface ComparisonCardProps {
 }
 
 export function ComparisonCard({
-  emoji,
+  imageUrl,
   title,
   subtitle,
   value,
@@ -33,8 +33,12 @@ export function ComparisonCard({
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border-subtle to-transparent" />
 
         <div className="flex-1 flex items-center justify-center mb-8">
-          <div className="w-44 h-44 bg-gradient-to-br from-accent-cyan-transparent to-accent-purple-transparent rounded-2xl flex items-center justify-center text-7xl opacity-80">
-            {emoji}
+          <div className="w-44 h-44 bg-gradient-to-br from-accent-cyan-transparent to-accent-purple-transparent rounded-2xl flex items-center justify-center text-7xl opacity-80 overflow-hidden">
+            <img
+              src={imageUrl}
+              alt={title}
+              className="w-full h-full object-contain"
+            />
           </div>
         </div>
 
