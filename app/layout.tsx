@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import { Background } from "@/components/Background";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Providers } from "@/components/Providers";
@@ -36,9 +37,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased relative`}
       >
-        <div className="decoration-grid"></div>
+        <Background />
         <Providers>
-          <div className="relative flex min-h-screen flex-col z-10">
+          <div className="relative flex min-h-screen flex-col z-20">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />

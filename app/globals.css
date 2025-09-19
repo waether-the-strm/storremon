@@ -85,13 +85,7 @@ body {
 }
 
 /* Gradient background overlay */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+.bg-gradient-overlay {
   background: radial-gradient(
       circle at 20% 50%,
       hsl(var(--accent-cyan) / 0.05) 0%,
@@ -102,20 +96,11 @@ body::before {
       hsl(var(--accent-purple) / 0.05) 0%,
       transparent 50%
     );
-  pointer-events: none;
-  z-index: 0;
 }
 
-/* Decorative grid overlay */
-.decoration-grid {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+/* Decoration grid pattern */
+.bg-grid-pattern {
   background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px),
     linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
   background-size: 100px 100px;
-  pointer-events: none;
-  z-index: 1;
 }
