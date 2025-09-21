@@ -8,18 +8,26 @@ import { ToggleButtonGroup } from "./ToggleButtonGroup";
 import { useDebounce } from "../hooks/useDebounce";
 
 export interface Pokemon {
+  id: number;
   name: string;
   height: number; // in decimeters
-  imageUrl: string;
+  weight: number;
+  sprite: string;
+  backSprite: string | null;
   types: string[];
+  primaryType: string;
+  generation: number;
+  category: string;
 }
 
 export interface Art {
+  id: number;
   title: string;
   artist: string;
   date: string;
   height: number; // in cm
-  imageUrl: string;
+  dimensions: string;
+  image: string;
 }
 
 // It's better to have this utility function outside or passed as a prop
@@ -177,7 +185,7 @@ export function ComparatorView({
         {/* Pokemon Panel */}
         {showPokemon && (
           <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-red-600 text-center">
+            <h2 className="text-2xl font-semibold text-red-600 text-center sr-only">
               Pokémon
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -187,17 +195,49 @@ export function ComparatorView({
                 pokemonData.map((pokemon) => (
                   <ComparisonCard
                     key={pokemon.name}
-                    imageUrl={pokemon.imageUrl}
-                    title={pokemon.name}
-                    subtitle={pokemon.types.join(", ")}
-                    value={`${pokemon.height / 10}m`}
+                    imageUrl={pokemon.sprite}
+                    backImageUrl={pokemon.backSprite || undefined}
+                    title={
+                      pokemon.name.charAt(0).toUpperCase() +
+                      pokemon.name.slice(1)
+                    }
+                    subtitle={pokemon.types.slice(0, 2).join(" • ")}
+                    value={`${(pokemon.height / 10).toFixed(1)}m`}
                     isRevealed={true}
+                    category={`#${pokemon.id.toString().padStart(3, "0")}`}
+                    badge={{ text: "POKÉ", variant: "pokemon" }}
+                    hasFlip={true}
+                    fallbackText={pokemon.name.charAt(0).toUpperCase()}
+                    metadata={{
+                      // FRONT: Basic info (max 2 for front display)
+                      type: pokemon.primaryType,
+                      gen: `Gen ${pokemon.generation}`,
+                      // BACK: Detailed info for horizontal bento grid
+                      weight: `${(pokemon.weight / 10).toFixed(1)}kg`,
+                      allTypes: pokemon.types.join(" • "),
+                      pokedexId: `#${pokemon.id.toString().padStart(3, "0")}`,
+                      category: pokemon.category,
+                    }}
                   />
                 ))
               ) : (
-                <p className="text-center col-span-full">
-                  No Pokémon found at this size.
-                </p>
+                <ComparisonCard
+                  imageUrl="invalid-url-to-trigger-fallback"
+                  title="Tajemniczy Pokémon"
+                  subtitle="Niewidzialny • Unikający"
+                  value="404cm"
+                  isRevealed={true}
+                  category="#404"
+                  badge={{ text: "POKÉ", variant: "pokemon" }}
+                  fallbackText="( ͡° ͜ʖ ͡°)"
+                  hasFlip={true}
+                  metadata={{
+                    type: "Niewidzialny",
+                    gen: "Gen ?",
+                    status: "W ukryciu",
+                    ability: "Niewidzialność",
+                  }}
+                />
               )}
             </div>
           </div>
@@ -206,7 +246,7 @@ export function ComparatorView({
         {/* Art Panel */}
         {showArt && (
           <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-blue-600 text-center">
+            <h2 className="text-2xl font-semibold text-blue-600 text-center sr-only">
               Museum Artifacts
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -217,18 +257,48 @@ export function ComparatorView({
               ) : artData.length > 0 ? (
                 artData.map((art) => (
                   <ComparisonCard
-                    key={art.title}
-                    imageUrl={art.imageUrl}
+                    key={art.id}
+                    imageUrl={art.image}
                     title={art.title}
-                    subtitle={art.artist}
+                    subtitle={art.artist || "Unknown Artist"}
                     value={`${art.height}cm`}
                     isRevealed={true}
+                    category={`#${art.id}`}
+                    badge={{ text: "ART", variant: "art" }}
+                    hasFlip={true}
+                    fallbackText={art.title.charAt(0).toUpperCase()}
+                    metadata={{
+                      // FRONT: Basic info
+                      period: art.date,
+                      artist: art.artist
+                        ? art.artist.split(" ").pop()
+                        : "Unknown",
+                      // BACK: Detailed info for bento grid
+                      dimensions: art.dimensions,
+                      fullArtist: art.artist || "Unknown Artist",
+                      artId: `#${art.id}`,
+                      category: "Museum Artifact",
+                    }}
                   />
                 ))
               ) : (
-                <p className="text-center col-span-full">
-                  No artifacts found at this size.
-                </p>
+                <ComparisonCard
+                  imageUrl="invalid-url-to-trigger-fallback"
+                  title="Zaginiony Eksponat"
+                  subtitle="Nieznany Artysta"
+                  value="∞cm"
+                  isRevealed={true}
+                  category="#404"
+                  badge={{ text: "ART", variant: "art" }}
+                  fallbackText="(╯°□°）╯︵ ┻━┻"
+                  hasFlip={true}
+                  metadata={{
+                    period: "Era Wifi",
+                    artist: "Nieznany",
+                    status: "Na przerwie",
+                    location: "Kawiarnia",
+                  }}
+                />
               )}
             </div>
           </div>

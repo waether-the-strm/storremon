@@ -25,22 +25,28 @@ export default function GamePage() {
 
   return (
     <div className="flex flex-1 flex-col px-12 py-16 max-w-screen-2xl w-full mx-auto">
-      <CategoryBadge category="animals" />
+      <CategoryBadge category="size" />
 
       <VSArena
         leftCard={{
-          emoji: "🐘",
-          title: "African Elephant",
-          subtitle: "Average adult weight",
-          value: "6,000 kg",
+          imageUrl:
+            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", // Bulbasaur
+          title: "Bulbasaur",
+          subtitle: "Grass/Poison Pokémon",
+          value: "0.7m",
           isRevealed: true,
+          category: "Pokémon",
+          type: "Known",
         }}
         rightCard={{
-          emoji: "🦏",
-          title: "White Rhinoceros",
-          subtitle: "Average adult weight",
-          value: "2,300 kg",
+          imageUrl:
+            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png", // Charmander
+          title: "Mystery Pokémon",
+          subtitle: "Fire type creature",
+          value: "0.6m",
           isRevealed: false,
+          category: "Pokémon",
+          type: "Unknown",
         }}
       />
 

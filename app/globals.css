@@ -22,6 +22,12 @@
   --accent-purple: 262 80% 63%; /* #a855f7 */
   --accent-purple-transparent: 262 80% 63% / 0.1; /* rgba(168,85,247,0.1) */
   --accent-yellow: 48 95% 64%; /* #fcd34d */
+  --accent-orange: 24 95% 53%; /* #ff6b1a */
+  --accent-green: 142 76% 36%; /* #16a34a */
+
+  /* Card enhancement colors */
+  --card-border-glow: 0 0% 100% / 0.15; /* rgba(255,255,255,0.15) */
+  --card-shadow-subtle: 0 0% 0% / 0.1; /* rgba(0,0,0,0.1) */
 
   /* Semantic colors */
   --primary: var(--accent-cyan);
@@ -37,7 +43,13 @@
   /* Spacing and sizing */
   --header-height: 5rem; /* 80px */
   --card-radius: 1.5rem; /* 24px */
+  --card-radius-inner: 1rem; /* 16px */
   --button-radius: 1rem; /* 16px */
+
+  /* Card specific dimensions */
+  --card-header-height: 3rem; /* 48px */
+  --card-image-height: 10rem; /* 160px */
+  --card-value-size: 3rem; /* 48px */
 }
 
 /* Light mode override (for future use) */
@@ -74,6 +86,10 @@
   --color-warning: hsl(var(--warning));
   --color-accent-cyan-transparent: hsl(var(--accent-cyan-transparent));
   --color-accent-purple-transparent: hsl(var(--accent-purple-transparent));
+  --color-accent-orange: hsl(var(--accent-orange));
+  --color-accent-green: hsl(var(--accent-green));
+  --color-card-border-glow: hsl(var(--card-border-glow));
+  --color-card-shadow-subtle: hsl(var(--card-shadow-subtle));
 
   /* Shadows */
   --shadow-primary: var(--shadow-primary);
@@ -87,8 +103,14 @@
 
   /* Border radius */
   --radius-card: var(--card-radius);
+  --radius-card-inner: var(--card-radius-inner);
   --radius-button: var(--button-radius);
   --radius-full: 9999px;
+
+  /* Card dimensions */
+  --size-card-header: var(--card-header-height);
+  --size-card-image: var(--card-image-height);
+  --size-card-value: var(--card-value-size);
 }
 
 /* Global styles */
@@ -134,6 +156,19 @@ body {
 
 .hover\:rotate-y-\[8deg\]:hover {
   transform: translateY(-4px) rotateY(8deg) rotateX(2deg);
+}
+
+/* Card flip animations */
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
 }
 
 /* Custom glow effects for toggle buttons */
@@ -287,4 +322,12 @@ body {
 .slider-custom::-moz-range-thumb:hover {
   transform: rotate(-15deg) scale(1.15);
   box-shadow: 0 0 15px rgba(239, 68, 68, 0.6), 0 0 30px rgba(239, 68, 68, 0.3);
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
