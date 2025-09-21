@@ -24,8 +24,80 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Størrémon",
-  description: "An interactive app to explore relative sizes",
+  title: "Størrémon - Compare Pokémon & Museum Artifacts by Size",
+  description:
+    "Discover surprising size similarities between Pokémon and classical museum artifacts. Interactive comparison tool with real data from PokéAPI and The Met Museum.",
+  keywords: [
+    "pokemon",
+    "museum",
+    "art",
+    "comparison",
+    "size",
+    "interactive",
+    "education",
+  ],
+  authors: [{ name: "Størrémon Team" }],
+  creator: "Størrémon",
+  publisher: "Størrémon",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL("https://storremon.strm.dev"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Størrémon - Compare Pokémon & Museum Artifacts by Size",
+    description:
+      "Discover surprising size similarities between Pokémon and classical museum artifacts. Interactive comparison tool with real data.",
+    url: "https://storremon.strm.dev",
+    siteName: "Størrémon",
+    images: [
+      {
+        url: "/thumbnails/og-image-1200x630.png",
+        width: 1200,
+        height: 630,
+        alt: "Størrémon - Pokémon vs Museum Art comparison",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Størrémon - Compare Pokémon & Museum Artifacts by Size",
+    description:
+      "Discover surprising size similarities between Pokémon and classical museum artifacts.",
+    images: ["/thumbnails/twitter-image-1200x675.png"],
+    creator: "@storremon",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      {
+        url: "/icons/apple-touch-icon.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
+    ],
+  },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
