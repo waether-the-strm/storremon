@@ -10,6 +10,7 @@ import {
 import { ComparisonCard } from "./ComparisonCard";
 import { PaginatedDots } from "./PaginatedDots";
 import { TabSwitcher } from "./TabSwitcher";
+import { emptyArtCardProps, emptyPokemonCardProps } from "./empty-card-data";
 
 interface TabbedStack {
   id: string;
@@ -48,6 +49,17 @@ const variants = {
     scale: 0.8,
     transition: { duration: 0.3 },
   }),
+};
+
+const EmptyCardPlaceholder = ({ type }: { type: string }) => {
+  const cardProps =
+    type === "pokemon" ? emptyPokemonCardProps : emptyArtCardProps;
+
+  return (
+    <div className="w-full h-full shadow-2xl">
+      <ComparisonCard {...cardProps} className="w-full h-full" />
+    </div>
+  );
 };
 
 export function TinderCardStack({
@@ -106,88 +118,96 @@ export function TinderCardStack({
         />
       )}
       <div className="relative w-full flex-1 flex items-center justify-center perspective-1000">
-        {/* Top (Draggable) Card */}
-        <AnimatePresence initial={false} custom={direction} mode="wait">
-          <motion.div
-            key={`${activeTab}-${page}`}
-            className="absolute w-full h-full"
-            style={{ x, rotateY, opacity }}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            custom={direction}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-            dragElastic={1}
-            onDragEnd={(e, { offset, velocity }) => {
-              const swipe = swipePower(offset.x, velocity.x);
-              if (swipe < -swipeThreshold) {
-                paginate(1); // Next
-              } else if (swipe > swipeThreshold) {
-                paginate(-1); // Previous
-              }
-            }}
-          >
-            {card ? <MemoizedCard item={card} /> : null}
-          </motion.div>
-        </AnimatePresence>
+        {items.length === 0 ? (
+          <EmptyCardPlaceholder type={activeStack.id} />
+        ) : (
+          <>
+            {/* Top (Draggable) Card */}
+            <AnimatePresence initial={false} custom={direction} mode="wait">
+              <motion.div
+                key={`${activeTab}-${page}`}
+                className="absolute w-full h-full"
+                style={{ x, rotateY, opacity }}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                custom={direction}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                dragElastic={1}
+                onDragEnd={(e, { offset, velocity }) => {
+                  const swipe = swipePower(offset.x, velocity.x);
+                  if (swipe < -swipeThreshold) {
+                    paginate(1); // Next
+                  } else if (swipe > swipeThreshold) {
+                    paginate(-1); // Previous
+                  }
+                }}
+              >
+                {card ? <MemoizedCard item={card} /> : null}
+              </motion.div>
+            </AnimatePresence>
 
-        {/* Action buttons */}
-        <button
-          onClick={() => paginate(-1)} // Previous
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-card/80 backdrop-blur-sm rounded-full border border-border hover:bg-card-hover transition-colors"
-          aria-label="Previous card"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
-        <button
-          onClick={() => paginate(1)} // Next
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-card/80 backdrop-blur-sm rounded-full border border-border hover:bg-card-hover transition-colors"
-          aria-label="Next card"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M9 18l6-6-6-6" />
-          </svg>
-        </button>
+            {/* Action buttons */}
+            <button
+              onClick={() => paginate(-1)} // Previous
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-card/80 backdrop-blur-sm rounded-full border border-border hover:bg-card-hover transition-colors"
+              aria-label="Previous card"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => paginate(1)} // Next
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-2 bg-card/80 backdrop-blur-sm rounded-full border border-border hover:bg-card-hover transition-colors"
+              aria-label="Next card"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </>
+        )}
       </div>
 
       {/* Bottom navigation */}
-      <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-center">
-        {/* Card Counter (left) */}
-        <div className="absolute left-0">
-          <div className="inline-block bg-card/80 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-foreground-secondary">
-            {cardIndex + 1} / {items.length}
+      {items.length > 0 && (
+        <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center justify-center">
+          {/* Card Counter (left) */}
+          <div className="absolute left-0">
+            <div className="inline-block bg-card/80 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-foreground-secondary">
+              {cardIndex + 1} / {items.length}
+            </div>
           </div>
-        </div>
 
-        {/* Progress indicator (center) */}
-        <PaginatedDots
-          total={items.length}
-          currentIndex={cardIndex}
-          maxVisible={20}
-        />
-      </div>
+          {/* Progress indicator (center) */}
+          <PaginatedDots
+            total={items.length}
+            currentIndex={cardIndex}
+            maxVisible={20}
+          />
+        </div>
+      )}
     </div>
   );
 }

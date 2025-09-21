@@ -13,6 +13,7 @@ import { ScaleSlider } from "./ScaleSlider";
 import { ToggleButtonGroup } from "./ToggleButtonGroup";
 import { useDebounce } from "../hooks/useDebounce";
 import { SizeContext } from "./Header";
+import { emptyArtCardProps, emptyPokemonCardProps } from "./empty-card-data";
 
 export interface Pokemon {
   id: number;
@@ -331,23 +332,7 @@ export function ComparatorView({
                       />
                     ))
                   ) : (
-                    <ComparisonCard
-                      imageUrl=""
-                      title="Mysterious Pokémon"
-                      subtitle="Invisible • Elusive"
-                      value="404cm"
-                      isRevealed={true}
-                      category="#404"
-                      badge={{ text: "POKÉ", variant: "pokemon" }}
-                      fallbackText="( ͡° ͜ʖ ͡°)"
-                      hasFlip={true}
-                      metadata={{
-                        type: "Unknown",
-                        gen: "Gen ?",
-                        status: "Hidden",
-                        ability: "Invisibility",
-                      }}
-                    />
+                    <ComparisonCard {...emptyPokemonCardProps} />
                   )}
                 </div>
               </div>
@@ -390,23 +375,7 @@ export function ComparatorView({
                       />
                     ))
                   ) : (
-                    <ComparisonCard
-                      imageUrl=""
-                      title="Lost Artwork"
-                      subtitle="Unknown Artist"
-                      value="∞cm"
-                      isRevealed={true}
-                      category="#404"
-                      badge={{ text: "ART", variant: "art" }}
-                      fallbackText="(╯°□°）╯︵ ┻━┻"
-                      hasFlip={true}
-                      metadata={{
-                        period: "Wifi Era",
-                        artist: "Unknown",
-                        status: "On a break",
-                        location: "Coffee Shop",
-                      }}
-                    />
+                    <ComparisonCard {...emptyArtCardProps} />
                   )}
                 </div>
               </div>
