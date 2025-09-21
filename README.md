@@ -40,7 +40,7 @@ The idea emerged from the fascinating intersection of scale perception across di
 - **3D Flip Animation**: Hardware-accelerated card flips revealing detailed metadata
 - **Responsive Layout**: Optimized for both desktop and mobile experiences
 
-### 🎲 **Game Mode** (MVP)
+### 🎲 **Game Mode** (UI draft)
 
 - Basic size comparison interface
 - Placeholder for future scoring system
