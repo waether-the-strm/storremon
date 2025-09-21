@@ -17,9 +17,28 @@ export function IntroTooltip({ className = "" }: IntroTooltipProps) {
 
   const isGamePage = pathname === "/game";
 
-  // Set initial state on mount
+  // Set initial state on mount based on localStorage
   useEffect(() => {
-    if (isExpanded) {
+    const storageKey = `introTooltipShown_${pathname}`;
+    const hasBeenShown = localStorage.getItem(storageKey);
+
+    if (hasBeenShown) {
+      // If shown before, start minimized
+      setIsExpanded(false);
+      setIsMinimized(true);
+      controls.set({
+        left: `calc(100vw - 80px)`,
+        top: `calc(100vh - 80px)`,
+        x: "0%",
+        y: "0%",
+        opacity: 1,
+        scale: 1,
+        rotate: finalRotationRef.current, // Use last known rotation
+      });
+    } else {
+      // If first time, start expanded (and pokeball hidden in center)
+      setIsExpanded(true);
+      setIsMinimized(false);
       controls.set({
         left: "50vw",
         top: "50vh",
@@ -28,20 +47,14 @@ export function IntroTooltip({ className = "" }: IntroTooltipProps) {
         opacity: 0,
         scale: 0.5,
       });
-    } else {
-      controls.set({
-        left: `calc(100vw - 80px)`,
-        top: `calc(100vh - 80px)`,
-        x: "0%",
-        y: "0%",
-        opacity: 1,
-        scale: 1,
-      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run only once
+  }, [pathname]); // Rerun when path changes
 
   const handleMinimize = useCallback(() => {
+    const storageKey = `introTooltipShown_${pathname}`;
+    localStorage.setItem(storageKey, "true"); // Mark as shown
+
     setIsExpanded(false);
 
     setTimeout(() => {
@@ -75,7 +88,7 @@ export function IntroTooltip({ className = "" }: IntroTooltipProps) {
     setTimeout(() => {
       setIsMinimized(true);
     }, 1100);
-  }, [controls]);
+  }, [controls, pathname]);
 
   const handleExpand = useCallback(() => {
     setIsMinimized(false);
@@ -240,7 +253,7 @@ export function IntroTooltip({ className = "" }: IntroTooltipProps) {
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="text-gray-600 dark:text-gray-800"
+                      className="text-gray-600 dark:text-amber-500/80"
                     >
                       <path d="M9.663 17h4.673M12 3v1m6.364 1.636-.707.707M21 12h-1M4 12H3m3.343-5.657-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386z" />
                     </svg>
@@ -251,22 +264,32 @@ export function IntroTooltip({ className = "" }: IntroTooltipProps) {
                     </h3>
                     {isGamePage ? (
                       <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                        This <strong>Game section</strong> showcases a concept
-                        for an interactive size comparison experience. The
-                        current interface is a <strong>design draft</strong>{" "}
+                        This{" "}
+                        <strong className="text-amber-500">Game section</strong>{" "}
+                        showcases a concept for an interactive size comparison
+                        experience. The current interface is a{" "}
+                        <strong className="text-amber-500">design draft</strong>{" "}
                         demonstrating potential UI patterns and user flows that
                         could be developed into a full gaming experience.
                       </p>
                     ) : (
                       <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                         This project showcases my expertise in{" "}
-                        <strong>Web Design</strong> and{" "}
-                        <strong>Frontend Development</strong>. Størrémon is an
-                        interactive prototype focusing on{" "}
-                        <strong>innovative user interactions</strong> and{" "}
-                        <strong>original interface design</strong> for exploring
-                        size relationships between objects through data
-                        visualization.
+                        <strong className="text-amber-500">Web Design</strong>{" "}
+                        and{" "}
+                        <strong className="text-amber-500">
+                          Frontend Development
+                        </strong>
+                        . Størrémon is an interactive prototype focusing on{" "}
+                        <strong className="text-amber-500">
+                          innovative user interactions
+                        </strong>{" "}
+                        and{" "}
+                        <strong className="text-amber-500">
+                          original interface design
+                        </strong>{" "}
+                        for exploring size relationships between objects through
+                        data visualization.
                       </p>
                     )}
                   </div>
