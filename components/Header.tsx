@@ -17,12 +17,18 @@ const NavLink = ({
 }) => (
   <Link
     href={href}
-    className="relative text-sm font-medium text-foreground-tertiary transition-colors hover:text-foreground"
+    className={`relative text-sm font-medium transition-colors hover:text-foreground ${
+      isActive ? "text-foreground" : "text-foreground-tertiary"
+    }`}
     data-active={isActive}
   >
     {children}
     {isActive && (
-      <span className="absolute -bottom-7 left-0 right-0 h-px bg-primary" />
+      <motion.span
+        className="absolute -bottom-7 left-0 right-0 h-px bg-primary"
+        layoutId="active-nav-underline"
+        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+      />
     )}
   </Link>
 );
@@ -47,16 +53,22 @@ export function Header() {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [showMobileStats, setShowMobileStats] = useState(false);
   const [showDesktopStats, setShowDesktopStats] = useState(true);
+  const [isHoveringNav, setIsHoveringNav] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
-  // Auto-hide mobile nav after 3 seconds
   useEffect(() => {
-    if (showMobileNav) {
+    setIsClient(true);
+  }, []);
+
+  // Auto-hide mobile nav after 3 seconds (only if not hovering)
+  useEffect(() => {
+    if (showMobileNav && !isHoveringNav) {
       const timer = setTimeout(() => {
         setShowMobileNav(false);
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [showMobileNav]);
+  }, [showMobileNav, isHoveringNav]);
 
   // Auto-hide mobile stats after 3 seconds
   useEffect(() => {
@@ -118,7 +130,7 @@ export function Header() {
         {/* Center content slot for size info on explorer page */}
         {pathname === "/" && context?.sizeInfo && (
           <motion.div
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 backdrop-blur-md z-10"
             initial={{ opacity: 0 }}
             animate={{ opacity: context.isHovering ? 1 : 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -134,7 +146,7 @@ export function Header() {
           </motion.div>
         )}
 
-        <div className="flex items-center gap-4 sm:gap-6 lg:gap-10">
+        <div className="flex items-center gap-4 sm:gap-10 lg:gap-14">
           {/* Logo section */}
           <div className="relative mobile-nav-container">
             <Link
@@ -163,32 +175,36 @@ export function Header() {
             <AnimatePresence>
               {showMobileNav && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="absolute top-full left-0 mt-2 bg-background/95 backdrop-blur-lg border border-border rounded-2xl p-3 shadow-xl min-w-[120px] sm:hidden z-[60]"
+                  initial={{ opacity: 0, x: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -10, scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="absolute top-1/2 left-full ml-4 transform -translate-y-1/2 bg-background/90 backdrop-blur-lg border border-border/60 rounded-2xl p-2 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.3),0_10px_10px_-5px_rgba(0,0,0,0.04)] sm:hidden z-100"
+                  onMouseEnter={() => setIsHoveringNav(true)}
+                  onMouseLeave={() => setIsHoveringNav(false)}
                 >
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-row gap-2">
                     <Link
                       href="/"
-                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ease-out ${
                         pathname === "/"
-                          ? "bg-primary/20 text-primary"
-                          : "text-foreground-secondary hover:text-foreground hover:bg-card"
+                          ? "bg-primary/20 text-primary border border-primary/30"
+                          : "text-foreground-secondary hover:text-white hover:bg-white/10 hover:scale-105 border border-transparent"
                       }`}
                       onClick={() => setShowMobileNav(false)}
+                      style={{ transformOrigin: "left center" }}
                     >
                       Explorer
                     </Link>
                     <Link
                       href="/game"
-                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ease-out ${
                         pathname === "/game"
-                          ? "bg-primary/20 text-primary"
-                          : "text-foreground-secondary hover:text-foreground hover:bg-card"
+                          ? "bg-primary/20 text-primary border border-primary/30"
+                          : "text-foreground-secondary hover:text-white hover:bg-white/10 hover:scale-105 border border-transparent"
                       }`}
                       onClick={() => setShowMobileNav(false)}
+                      style={{ transformOrigin: "left center" }}
                     >
                       Game
                     </Link>
@@ -275,7 +291,7 @@ export function Header() {
             }`}
             onClick={handleStatsClick}
             title={
-              typeof window !== "undefined" && window.innerWidth >= 768
+              isClient && window.innerWidth >= 768
                 ? showDesktopStats
                   ? "Hide stats"
                   : "Show stats"
