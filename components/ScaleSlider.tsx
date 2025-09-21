@@ -44,7 +44,7 @@ export function ScaleSlider({
   className = "",
   showDescription = true,
 }: ScaleSliderProps) {
-  const [isHovering, setIsHovering] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
   const [densityData, setDensityData] = useState<DensityData | null>(null);
 
   useEffect(() => {
@@ -160,8 +160,10 @@ export function ScaleSlider({
       <div className="w-full max-w-2xl">
         <div
           className="relative flex items-center bg-gray-500/10 backdrop-blur-xs rounded-3xl p-3 sm:p-6 shadow-inner overflow-hidden"
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
+          onPointerEnter={() => setIsInteracting(true)}
+          onPointerLeave={() => setIsInteracting(false)}
+          onPointerDown={() => setIsInteracting(true)}
+          onPointerUp={() => setIsInteracting(false)}
         >
           {/* Scale Boundary Lines */}
           <div className="absolute top-0 bottom-0 left-3 sm:left-6 right-3 sm:right-6 pointer-events-none">
@@ -181,7 +183,7 @@ export function ScaleSlider({
             value={value}
             onChange={(e) => handleChange(Number(e.target.value))}
             className={`w-full rounded-full appearance-none cursor-pointer slider-custom ${
-              isHovering ? "thumb-active" : ""
+              isInteracting ? "thumb-active" : ""
             }`}
             style={{
               backgroundImage: `${generateHeatmapBackground().redGradient}, ${
@@ -194,7 +196,7 @@ export function ScaleSlider({
           />
 
           {/* Tooltip - only show on hover */}
-          {isHovering && (
+          {isInteracting && (
             <div
               className="absolute -top-12 transform -translate-x-1/2 bg-gray-900/90 text-white text-xs px-3 py-2 rounded-lg transition-opacity duration-200 pointer-events-none"
               style={{ left: `${value}%` }}

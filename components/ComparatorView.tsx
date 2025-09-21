@@ -248,8 +248,10 @@ export function ComparatorView({
           backdropFilter: sliderBlur,
           boxShadow: sliderShadow,
         }}
-        onMouseEnter={() => context?.setIsHovering(true)}
-        onMouseLeave={() => context?.setIsHovering(false)}
+        onPointerEnter={() => context?.setIsHovering(true)}
+        onPointerLeave={() => context?.setIsHovering(false)}
+        onPointerDown={() => context?.setIsHovering(true)}
+        onPointerUp={() => context?.setIsHovering(false)}
       >
         <ScaleSlider
           value={sliderValue}

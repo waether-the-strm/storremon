@@ -8,7 +8,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     size: string;
     category: string;
   } | null>(null);
-  const [isHovering, setIsHovering] = React.useState(false);
+  const [isInteracting, setIsInteracting] = React.useState(false);
   const [pokemonCount, setPokemonCount] = React.useState<number | null>(null);
   const [artCount, setArtCount] = React.useState<number | null>(null);
 
@@ -16,14 +16,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
     () => ({
       sizeInfo,
       setSizeInfo,
-      isHovering,
-      setIsHovering,
+      isHovering: isInteracting,
+      setIsHovering: setIsInteracting,
       pokemonCount,
       setPokemonCount,
       artCount,
       setArtCount,
     }),
-    [sizeInfo, isHovering, pokemonCount, artCount]
+    [sizeInfo, isInteracting, pokemonCount, artCount]
   );
 
   return <SizeContext.Provider value={value}>{children}</SizeContext.Provider>;
