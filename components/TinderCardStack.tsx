@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
   motion,
-  PanInfo,
   AnimatePresence,
   useMotionValue,
   useTransform,
@@ -210,7 +209,9 @@ const MemoizedCard = React.memo(({ item }: { item: any }) => {
             ? item.types.slice(0, 2).join(" • ")
             : item.artist || item.subtitle || ""
         }
-        value={item.height ? `${item.height * 10}cm` : `${item.height}cm`}
+        value={
+          item.types ? `${item.height * 10}cm` : `${item.height.toFixed(1)}cm`
+        }
         isRevealed={true}
         category={
           item.id ? `#${item.id.toString().padStart(3, "0")}` : `#${item.id}`

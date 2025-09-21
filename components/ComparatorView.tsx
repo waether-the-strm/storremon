@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useContext, useCallback } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import {
   motion,
   useScroll,
@@ -13,8 +13,6 @@ import { ScaleSlider } from "./ScaleSlider";
 import { ToggleButtonGroup } from "./ToggleButtonGroup";
 import { useDebounce } from "../hooks/useDebounce";
 import { SizeContext } from "./Header";
-import { TabSwitcher } from "./TabSwitcher";
-import { AnimatePresence } from "framer-motion";
 
 export interface Pokemon {
   id: number;
@@ -110,7 +108,7 @@ export function ComparatorView({
         setIsPokemonLoading(true);
         try {
           // Pokemon height is in decimeters, so we convert cm to dm
-          const sizeInDm = Math.round(sizeInCm / 10);
+          const sizeInDm = Math.max(1, Math.floor(sizeInCm / 10));
           const response = await fetch(`/api/pokemon/${sizeInDm}`);
           if (!response.ok) throw new Error("Network response was not ok");
           const data = await response.json();
@@ -373,7 +371,7 @@ export function ComparatorView({
                         imageUrl={art.image}
                         title={art.title}
                         subtitle={art.artist || "Unknown Artist"}
-                        value={`${art.height}cm`}
+                        value={`${art.height.toFixed(1)}cm`}
                         isRevealed={true}
                         category={`#${art.id}`}
                         badge={{ text: "ART", variant: "art" }}
