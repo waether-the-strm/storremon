@@ -1,33 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ComparatorView } from "@/components/ComparatorView";
 
 export default function Home() {
   const [showPokemon, setShowPokemon] = useState(true);
   const [showArt, setShowArt] = useState(true);
 
-  // Generate individual gradient opacities for smooth fade transitions
-  const getPokemonOpacity = () => {
-    if (showPokemon && !showArt) return 1; // Only Pokemon active
-    if (showPokemon && showArt) return 1; // Both active (for dual gradient)
-    return 0; // Pokemon inactive
+  const handleToggleChange = (optionId: "pokemon" | "art") => {
+    if (optionId === "pokemon") {
+      // If it's the only one active, toggle it off and the other on
+      if (showPokemon && !showArt) {
+        setShowPokemon(false);
+        setShowArt(true);
+      } else {
+        setShowPokemon(!showPokemon);
+      }
+    } else if (optionId === "art") {
+      // If it's the only one active, toggle it off and the other on
+      if (showArt && !showPokemon) {
+        setShowArt(false);
+        setShowPokemon(true);
+      } else {
+        setShowArt(!showArt);
+      }
+    }
   };
 
-  const getArtOpacity = () => {
-    if (showArt && !showPokemon) return 1; // Only Art active
-    if (showPokemon && showArt) return 1; // Both active (for dual gradient)
-    return 0; // Art inactive
-  };
-
-  const getDualGradientOpacity = () => {
-    return showPokemon && showArt ? 1 : 0; // Only show dual gradient when both active
-  };
-
-  const handleToggleChange = (pokemon: boolean, art: boolean) => {
-    setShowPokemon(pokemon);
-    setShowArt(art);
-  };
+  const pokemonOpacity = showPokemon && !showArt ? 1 : 0;
+  const artOpacity = showArt && !showPokemon ? 1 : 0;
+  const dualOpacity = showPokemon && showArt ? 1 : 0;
 
   return (
     <div className="relative flex flex-1 flex-col">
@@ -41,7 +43,7 @@ export default function Home() {
           background:
             "radial-gradient(ellipse at center, transparent 20%, rgba(239,68,68,0.06) 60%, rgba(239,68,68,0.12) 100%)",
           boxShadow: "inset 0 0 120px rgba(239,68,68,0.08)",
-          opacity: showPokemon && !showArt ? getPokemonOpacity() : 0,
+          opacity: pokemonOpacity,
         }}
       />
 
@@ -53,7 +55,7 @@ export default function Home() {
           background:
             "radial-gradient(ellipse at center, transparent 20%, rgba(59,130,246,0.12) 60%, rgba(59,130,246,0.18) 100%)",
           boxShadow: "inset 0 0 120px rgba(59,130,246,0.14)",
-          opacity: showArt && !showPokemon ? getArtOpacity() : 0,
+          opacity: artOpacity,
         }}
       />
 
@@ -66,12 +68,16 @@ export default function Home() {
             "linear-gradient(to right, rgba(239,68,68,0.08), transparent, rgba(59,130,246,0.12))",
           boxShadow:
             "inset 40px 0 80px -40px rgba(239,68,68,0.08), inset -40px 0 80px -40px rgba(59,130,246,0.12)",
-          opacity: getDualGradientOpacity(),
+          opacity: dualOpacity,
         }}
       />
 
-      <div className="relative z-10 flex flex-1 flex-col px-12 py-16 max-w-screen-2xl w-full mx-auto">
-        <ComparatorView onToggleChange={handleToggleChange} />
+      <div className="relative z-10 flex flex-1 flex-col px-4 sm:px-8 lg:px-12 py-8 sm:py-16 max-w-screen-2xl w-full mx-auto">
+        <ComparatorView
+          showPokemon={showPokemon}
+          showArt={showArt}
+          onToggleChange={handleToggleChange}
+        />
       </div>
     </div>
   );

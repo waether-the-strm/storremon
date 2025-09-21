@@ -1,11 +1,17 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState, useEffect, useRef, useContext, useCallback } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useMotionValueEvent,
+} from "framer-motion";
 import { ComparisonCard } from "./ComparisonCard";
 import { ScaleSlider } from "./ScaleSlider";
 import { ToggleButtonGroup } from "./ToggleButtonGroup";
 import { useDebounce } from "../hooks/useDebounce";
+import { SizeContext } from "./Header";
 
 export interface Pokemon {
   id: number;
@@ -39,24 +45,59 @@ const valueToSizeCm = (val: number): number => {
   return Math.exp(logValue);
 };
 
+const formatSize = (cm: number) => {
+  return `${cm.toFixed(1)}cm`;
+};
+
+const getScaleLabel = (val: number) => {
+  const sizeInCm = valueToSizeCm(val);
+
+  if (sizeInCm < 1) return "Microscopic";
+  if (sizeInCm < 50) return "Tiny";
+  if (sizeInCm < 220) return "Human-sized";
+  if (sizeInCm < 1000) return "Large";
+  return "Colossal";
+};
+
 interface ComparatorViewProps {
   className?: string;
-  onToggleChange?: (showPokemon: boolean, showArt: boolean) => void;
+  showPokemon: boolean;
+  showArt: boolean;
+  onToggleChange: (optionId: "pokemon" | "art") => void;
 }
 
 export function ComparatorView({
   className = "",
+  showPokemon,
+  showArt,
   onToggleChange,
 }: ComparatorViewProps) {
-  const [showPokemon, setShowPokemon] = useState(true);
-  const [showArt, setShowArt] = useState(true);
   const [sliderValue, setSliderValue] = useState(50);
   const debouncedSliderValue = useDebounce(sliderValue, 300); // 300ms delay
 
   const [pokemonData, setPokemonData] = useState<Pokemon[]>([]);
   const [artData, setArtData] = useState<Art[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
   const [isPokemonLoading, setIsPokemonLoading] = useState(false);
   const [isArtLoading, setIsArtLoading] = useState(false);
+  const context = useContext(SizeContext);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      const mobile = window.innerWidth < 640;
+      setIsMobile(mobile);
+      if (mobile) {
+        document.documentElement.classList.add("snap-container-mobile");
+      } else {
+        document.documentElement.classList.remove("snap-container-mobile");
+      }
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,39 +145,61 @@ export function ComparatorView({
   }, [debouncedSliderValue, showPokemon, showArt]);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
+  const { scrollY } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
   });
 
-  const scale = useTransform(scrollYProgress, [0, 0.1], [1, 0.9]);
-  const opacity = useTransform(scrollYProgress, [0, 0.1], [1, 0.1]);
+  const [sliderBgOpacity, setSliderBgOpacity] = useState(0);
+  const motionDivRef = useRef(null);
 
-  // Notify parent about initial toggle state
+  const opacity = useTransform(scrollY, [0, 200, 300], [1, 0.1, 0]);
+  const scale = useTransform(scrollY, [0, 200, 300], [1, 0.95, 0.9]);
+  const sliderBlur = useTransform(
+    scrollY,
+    [0, 100],
+    ["blur(0px)", "blur(12px)"]
+  );
+  const sliderShadow = useTransform(
+    scrollY,
+    [0, 100],
+    [
+      "0px 0px 0px hsla(0, 0%, 100%, 0)",
+      "0 15px 50px -10px hsla(0, 0%, 0%, 0.9)",
+    ]
+  );
+
+  // Update global size info from context
   useEffect(() => {
-    onToggleChange?.(showPokemon, showArt);
-  }, []);
+    if (!context?.setSizeInfo) return;
+    const size = formatSize(valueToSizeCm(sliderValue));
+    const category = `${getScaleLabel(
+      sliderValue
+    )} • Finding objects of this size...`;
+    context.setSizeInfo({ size, category });
+  }, [sliderValue, context?.setSizeInfo]);
+
+  // Update global counts from context
+  useEffect(() => {
+    if (context?.setPokemonCount) {
+      context.setPokemonCount(pokemonData.length);
+    }
+  }, [pokemonData, context?.setPokemonCount]);
+
+  useEffect(() => {
+    if (context?.setArtCount) {
+      context.setArtCount(artData.length);
+    }
+  }, [artData, context?.setArtCount]);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const opacityValue = Math.min(latest / 100, 0.9);
+    setSliderBgOpacity(opacityValue);
+  });
 
   const handleToggle = (optionId: string) => {
-    const isPokemon = optionId === "pokemon";
-    const isArt = optionId === "art";
-
-    if (isPokemon || isArt) {
-      const [currentShow, otherShow, setCurrentShow, setOtherShow] = isPokemon
-        ? [showPokemon, showArt, setShowPokemon, setShowArt]
-        : [showArt, showPokemon, setShowArt, setShowPokemon];
-
-      if (currentShow && !otherShow) {
-        setCurrentShow(false);
-        setOtherShow(true);
-        onToggleChange?.(!currentShow, !otherShow);
-      } else if (currentShow && otherShow) {
-        setCurrentShow(false);
-        onToggleChange?.(!currentShow, otherShow);
-      } else {
-        setCurrentShow(true);
-        onToggleChange?.(currentShow, !otherShow);
-      }
+    if (optionId === "pokemon" || optionId === "art") {
+      onToggleChange(optionId);
     }
   };
 
@@ -151,10 +214,15 @@ export function ComparatorView({
   ];
 
   return (
-    <div ref={containerRef} className={`flex flex-col space-y-8 ${className}`}>
+    <div
+      ref={containerRef}
+      className={`flex flex-col space-y-4 sm:space-y-8 scroll-smooth snap-y snap-mandatory sm:snap-none scroll-pt-[120px] ${className}`}
+    >
+      {/* Header section with title and controls that fade on scroll */}
       <motion.div
-        className="sticky top-36 flex flex-col items-center space-y-4 mb-16"
-        style={{ scale, opacity }}
+        ref={motionDivRef}
+        className={`sticky top-36 flex flex-col items-center space-y-4 mb-16`}
+        style={{ opacity, scale }}
       >
         <h1 className="text-3xl font-bold text-center">Størrémon</h1>
         {/* Category Toggle Header */}
@@ -170,11 +238,24 @@ export function ComparatorView({
             between Pokémon and Museum artifacts.
           </p>
         </div>
+      </motion.div>
 
-        {/* Scale Slider */}
-        <div className="w-full max-w-4xl mx-auto">
-          <ScaleSlider value={sliderValue} onChange={setSliderValue} />
-        </div>
+      {/* Scale Slider - always visible and sticky */}
+      <motion.div
+        className={`sticky top-20 sm:top-24 z-50 w-full sm:w-4/5 lg:w-1/2 mx-auto py-2 sm:py-4 px-4 sm:px-6 rounded-2xl border border-border/50`}
+        style={{
+          backgroundColor: `hsl(var(--background) / ${sliderBgOpacity})`,
+          backdropFilter: sliderBlur,
+          boxShadow: sliderShadow,
+        }}
+        onMouseEnter={() => context?.setIsHovering(true)}
+        onMouseLeave={() => context?.setIsHovering(false)}
+      >
+        <ScaleSlider
+          value={sliderValue}
+          onChange={setSliderValue}
+          showDescription={false}
+        />
       </motion.div>
       {/* Two-panel Layout */}
       <div
@@ -188,13 +269,14 @@ export function ComparatorView({
             <h2 className="text-2xl font-semibold text-red-600 text-center sr-only">
               Pokémon
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {isPokemonLoading ? (
                 <p className="text-center col-span-full">Loading Pokémon...</p>
               ) : pokemonData.length > 0 ? (
                 pokemonData.map((pokemon) => (
                   <ComparisonCard
                     key={pokemon.name}
+                    className={isMobile ? "snap-end" : ""}
                     imageUrl={pokemon.sprite}
                     backImageUrl={pokemon.backSprite || undefined}
                     title={
@@ -202,7 +284,7 @@ export function ComparatorView({
                       pokemon.name.slice(1)
                     }
                     subtitle={pokemon.types.slice(0, 2).join(" • ")}
-                    value={`${(pokemon.height / 10).toFixed(1)}m`}
+                    value={`${pokemon.height * 10}cm`}
                     isRevealed={true}
                     category={`#${pokemon.id.toString().padStart(3, "0")}`}
                     badge={{ text: "POKÉ", variant: "pokemon" }}
@@ -222,9 +304,10 @@ export function ComparatorView({
                 ))
               ) : (
                 <ComparisonCard
+                  className={isMobile ? "snap-end" : ""}
                   imageUrl="invalid-url-to-trigger-fallback"
-                  title="Tajemniczy Pokémon"
-                  subtitle="Niewidzialny • Unikający"
+                  title="Mysterious Pokémon"
+                  subtitle="Invisible • Elusive"
                   value="404cm"
                   isRevealed={true}
                   category="#404"
@@ -232,10 +315,10 @@ export function ComparatorView({
                   fallbackText="( ͡° ͜ʖ ͡°)"
                   hasFlip={true}
                   metadata={{
-                    type: "Niewidzialny",
+                    type: "Unknown",
                     gen: "Gen ?",
-                    status: "W ukryciu",
-                    ability: "Niewidzialność",
+                    status: "Hidden",
+                    ability: "Invisibility",
                   }}
                 />
               )}
@@ -249,7 +332,7 @@ export function ComparatorView({
             <h2 className="text-2xl font-semibold text-blue-600 text-center sr-only">
               Museum Artifacts
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {isArtLoading ? (
                 <p className="text-center col-span-full">
                   Loading Artifacts...
@@ -258,6 +341,7 @@ export function ComparatorView({
                 artData.map((art) => (
                   <ComparisonCard
                     key={art.id}
+                    className={isMobile ? "snap-end" : ""}
                     imageUrl={art.image}
                     title={art.title}
                     subtitle={art.artist || "Unknown Artist"}
@@ -283,9 +367,10 @@ export function ComparatorView({
                 ))
               ) : (
                 <ComparisonCard
+                  className={isMobile ? "snap-end" : ""}
                   imageUrl="invalid-url-to-trigger-fallback"
-                  title="Zaginiony Eksponat"
-                  subtitle="Nieznany Artysta"
+                  title="Lost Artwork"
+                  subtitle="Unknown Artist"
                   value="∞cm"
                   isRevealed={true}
                   category="#404"
@@ -293,10 +378,10 @@ export function ComparatorView({
                   fallbackText="(╯°□°）╯︵ ┻━┻"
                   hasFlip={true}
                   metadata={{
-                    period: "Era Wifi",
-                    artist: "Nieznany",
-                    status: "Na przerwie",
-                    location: "Kawiarnia",
+                    period: "Wifi Era",
+                    artist: "Unknown",
+                    status: "On a break",
+                    location: "Coffee Shop",
                   }}
                 />
               )}
