@@ -263,7 +263,7 @@ export function IntroTooltip({ className = "" }: IntroTooltipProps) {
                         <strong>Web Design</strong> and{" "}
                         <strong>Frontend Development</strong>. Størrémon is an
                         interactive prototype focusing on{" "}
-                        <strong>innovative user interactions</strong> and
+                        <strong>innovative user interactions</strong> and{" "}
                         <strong>original interface design</strong> for exploring
                         size relationships between objects through data
                         visualization.
