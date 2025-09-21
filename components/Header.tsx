@@ -139,11 +139,24 @@ export function Header() {
           <div className="relative mobile-nav-container">
             <Link
               href="/"
-              className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg font-semibold tracking-tighter"
+              className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg font-semibold tracking-tighter group relative"
               onClick={handleLogoClick}
             >
-              <div className="h-6 w-6 sm:h-8 sm:w-8 rounded-lg bg-gradient-to-br from-primary to-secondary opacity-90" />
-              <span className="hidden sm:inline">Størrémon</span>
+              <div className="relative">
+                <img
+                  src="/icons/icon-192x192.png"
+                  alt="Størrémon Logo"
+                  className="h-6 w-6 sm:h-8 sm:w-8 rounded-lg transition-all duration-300 ease-out group-hover:scale-110 relative z-10"
+                />
+                <div className="absolute inset-0 rounded-lg transition-all duration-300 ease-out group-hover:shadow-[-10px_0_20px_rgba(239,68,68,0.6)] group-hover:shadow-red-500/60 -z-10" />
+                <div className="absolute inset-0 rounded-lg transition-all duration-300 ease-out group-hover:shadow-[10px_0_20px_rgba(59,130,246,0.6)] group-hover:shadow-blue-500/60 -z-10" />
+              </div>
+              <span
+                className="hidden sm:inline transition-all duration-300 ease-out group-hover:scale-105 group-hover:translate-x-2 group-hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.4),_0_0_8px_rgba(59,130,246,0.4)]"
+                style={{ transformOrigin: "left center" }}
+              >
+                Størrémon
+              </span>
             </Link>
 
             {/* Mobile navigation dropdown */}
