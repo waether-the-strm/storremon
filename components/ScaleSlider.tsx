@@ -9,6 +9,8 @@ interface ScaleSliderProps {
   onChange: (value: number) => void;
   className?: string;
   showDescription?: boolean;
+  showPokemon?: boolean;
+  showArt?: boolean;
 }
 
 interface DensityData {
@@ -45,6 +47,8 @@ export function ScaleSlider({
   onChange,
   className = "",
   showDescription = true,
+  showPokemon = true,
+  showArt = true,
 }: ScaleSliderProps) {
   const [isInteracting, setIsInteracting] = useState(false);
   const [densityData, setDensityData] = useState<DensityData | null>(null);
@@ -211,13 +215,19 @@ export function ScaleSlider({
                       d={`${pathData} L ${
                         pokemonPoints[pokemonPoints.length - 1].x
                       } 0 L ${pokemonPoints[0].x} 0 Z`}
-                      fill="rgba(239, 68, 68, 0.6)"
+                      fill={
+                        showPokemon
+                          ? "rgba(239, 68, 68, 0.6)"
+                          : "rgba(100, 100, 100, 0.3)"
+                      }
                       stroke="none"
                     />
                     <path
                       d={pathData}
                       fill="none"
-                      stroke="rgb(239, 68, 68)"
+                      stroke={
+                        showPokemon ? "rgb(239, 68, 68)" : "rgb(120, 120, 120)"
+                      }
                       strokeWidth="1"
                       vectorEffect="non-scaling-stroke"
                     />
@@ -247,13 +257,19 @@ export function ScaleSlider({
                       d={`${pathData} L ${
                         museumPoints[museumPoints.length - 1].x
                       } 0 L ${museumPoints[0].x} 0 Z`}
-                      fill="rgba(59, 130, 246, 0.6)"
+                      fill={
+                        showArt
+                          ? "rgba(59, 130, 246, 0.6)"
+                          : "rgba(100, 100, 100, 0.3)"
+                      }
                       stroke="none"
                     />
                     <path
                       d={pathData}
                       fill="none"
-                      stroke="rgb(59, 130, 246)"
+                      stroke={
+                        showArt ? "rgb(59, 130, 246)" : "rgb(120, 120, 120)"
+                      }
                       strokeWidth="1"
                       vectorEffect="non-scaling-stroke"
                     />
@@ -289,7 +305,7 @@ export function ScaleSlider({
             max="100"
             value={value}
             onChange={(e) => handleChange(Number(e.target.value))}
-            className="absolute inset-0 w-full h-full appearance-none bg-transparent cursor-pointer opacity-0"
+            className="absolute inset-0 w-full h-full appearance-none bg-transparent cursor-ew-resize opacity-0"
           />
         </div>
 

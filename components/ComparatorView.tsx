@@ -287,6 +287,8 @@ export function ComparatorView({
           value={sliderValue}
           onChange={setSliderValue}
           showDescription={false}
+          showPokemon={showPokemon}
+          showArt={showArt}
         />
       </motion.div>
       {/* Two-panel Layout */}
