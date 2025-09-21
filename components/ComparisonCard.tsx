@@ -33,6 +33,7 @@ interface ComparisonCardProps {
   fallbackText?: string; // Text to show when image fails to load
   hasFlip?: boolean; // Enable card flip for additional content
   backImageUrl?: string; // Additional image for back side (e.g., Pokemon back sprite)
+  className?: string; // Allow passing additional classes
 }
 
 export function ComparisonCard({
@@ -50,6 +51,7 @@ export function ComparisonCard({
   fallbackText,
   hasFlip = false,
   backImageUrl,
+  className = "",
 }: ComparisonCardProps) {
   // State for card flip
   const [isFlipped, setIsFlipped] = React.useState(false);
@@ -88,7 +90,7 @@ export function ComparisonCard({
   };
 
   return (
-    <div className={`${perspectiveClass} w-full`}>
+    <div className={`${perspectiveClass} w-full ${className}`}>
       <div
         className={`
           relative w-full h-[420px] transition-all duration-700 transform-style-preserve-3d
@@ -172,7 +174,7 @@ export function ComparisonCard({
           </div>
 
           {/* Content section - FIXED HEIGHT */}
-          <div className="flex-1 px-4 pb-4 flex flex-col justify-between min-h-[200px]">
+          <div className="flex-1 px-4 pb-4 flex flex-col justify-around sm:min-h-52">
             {/* Title and subtitle - FIXED HEIGHT */}
             <div className="text-center h-16 flex flex-col justify-center">
               <h2 className="text-lg font-semibold mb-1 tracking-tight line-clamp-1">
@@ -206,7 +208,7 @@ export function ComparisonCard({
               )}
 
             {/* Value display - FIXED HEIGHT */}
-            <div className="text-center h-20 flex items-center justify-center">
+            <div className="text-center md:h-20 flex items-center justify-center">
               <div className="text-4xl font-bold tracking-tight relative">
                 <div
                   className={`absolute inset-0 text-foreground-tertiary transition-opacity duration-500 ${
