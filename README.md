@@ -126,7 +126,7 @@ The idea emerged from the fascinating intersection of scale perception across di
    - Hardware acceleration with `will-change`
    - Debounced API calls during slider interaction
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Install dependencies
@@ -148,7 +148,7 @@ npm lint     # Code linting with Biome
 npm format   # Code formatting
 ```
 
-## 🎨 Design Philosophy
+## Design Philosophy
 
 ### Dual Aesthetic Approach
 
@@ -165,7 +165,58 @@ This duality reflects the project's core concept of bridging entertainment and e
 - **Responsive design**: Desktop-first with mobile optimizations
 - **Accessibility considerations**: Semantic HTML, keyboard navigation support
 
-## 🧠 Key Technical Decisions
+## Design System & Styling Decisions
+
+### CSS Architecture with Tailwind 4
+
+**Approach**: Utility-first with CSS custom properties as design tokens  
+**Why**: Maintains design consistency while leveraging Tailwind's performance benefits
+
+#### Design Token Strategy
+
+- **Single Source of Truth**: All design tokens defined in `globals.css` using CSS custom properties
+- **Theme Mapping**: Tokens mapped to Tailwind classes via `@theme` directive
+- **Semantic Naming**: `--color-primary`, `--color-foreground-secondary` for clear hierarchy
+- **HSL Color Space**: All colors defined in HSL for easy manipulation and theme switching
+
+#### Theming Architecture
+
+```css
+:root {
+  --background: 240 4% 4%; /* Dark mode primary */
+  --foreground: 0 0% 100%; /* High contrast text */
+  --primary: 198 100% 50%; /* Accent cyan */
+  --secondary: 262 80% 63%; /* Accent purple */
+}
+
+.light {
+  --background: 0 0% 100%; /* Light mode override */
+  --foreground: 240 10% 3.9%; /* Dark text */
+}
+```
+
+### Component Styling Philosophy
+
+**No Custom CSS Classes**: All styling done through Tailwind utility classes  
+**Why**: Better maintainability, smaller bundle size, consistent design system
+
+**Icon Strategy**: Lucide React over inline SVG  
+**Why**: Better maintainability, consistent icon system, easier customization
+
+### Performance Considerations
+
+- **Transform/Opacity Only**: All animations use CSS transforms for 60fps performance
+- **Hardware Acceleration**: Strategic use of `will-change` for smooth animations
+- **Bundle Optimization**: Minimal custom CSS, maximum Tailwind utility usage
+
+### Design System Benefits
+
+1. **Scalability**: Easy to add new themes or modify existing ones
+2. **Consistency**: All components use the same design tokens
+3. **Performance**: Tailwind's purging removes unused styles
+4. **Developer Experience**: Clear, semantic class names and comprehensive IntelliSense
+
+## Key Technical Decisions
 
 ### 1. API Proxy Pattern
 
@@ -223,7 +274,7 @@ Given more development time, these features would enhance the experience:
 - [ ] **Mobile-first Redesign**: Touch-optimized interactions
 - [ ] **Personalization**: User preferences, history tracking
 
-## 📝 Project Structure
+## Project Structure
 
 ```
 storremon/
@@ -243,7 +294,7 @@ storremon/
 └── types/              # TypeScript definitions
 ```
 
-## 🎯 Development Approach
+## Development Approach
 
 This project was built following an iterative, time-boxed approach:
 
@@ -254,12 +305,6 @@ This project was built following an iterative, time-boxed approach:
 
 The development prioritized working functionality that demonstrates technical competency while maintaining code quality and user experience standards.
 
-## 📄 Documentation
-
-- **[Sprint Guide](docs/project/SPRINT-GUIDE.md)**: Detailed development progress and task tracking
-- **[Project Brief](docs/project/PROJECT-BRIEF.md)**: Original requirements and constraints
-- **[Technical Specs](docs/project/PROJECT.md)**: In-depth architectural decisions
-
 ---
 
 <div align="center">
@@ -268,6 +313,6 @@ The development prioritized working functionality that demonstrates technical co
 
 **Built with ❤️ by [Jan Mirecki](https://github.com/yourusername) | [STRM.dev](https://strm.dev)**
 
-_This project demonstrates full-stack React/Next.js development capabilities through a unique, data-driven user experience that bridges gaming and educational content._
+_This project demonstrates full-stack React/Next.js development capabilities through a unique, data-driven user experience that bridges gaming and educational content. All UX/UI design, technical architecture, and implementation by Jan Mirecki._
 
 </div>
