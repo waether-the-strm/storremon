@@ -261,7 +261,7 @@ export function ComparatorView({
           {/* Large Size Display */}
           <div className="mt-4 text-center">
             <div className="text-4xl sm:text-5xl font-bold text-white/95 mb-2 font-mono tracking-wider">
-              {formatSize(valueToSizeCm(sliderValue))}
+              {Math.round(valueToSizeCm(sliderValue))}cm
             </div>
             <div className="text-xs sm:text-sm text-gray-400/70">
               {getScaleLabel(sliderValue)} scale
