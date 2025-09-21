@@ -18,7 +18,7 @@ interface VSArenaProps {
 
 export function VSArena({ leftCard, rightCard }: VSArenaProps) {
   return (
-    <div className="flex-1 grid grid-cols-[1fr_auto_1fr] gap-20 items-center mb-15">
+    <div className="flex-1 grid grid-cols-[1fr_auto_1fr] gap-1 sm:gap-8 lg:gap-20 items-center mb-6 sm:mb-10 lg:mb-15">
       <ComparisonCard
         imageUrl={leftCard.imageUrl}
         title={leftCard.title}

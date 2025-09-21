@@ -24,8 +24,10 @@ export default function GamePage() {
   const handleHeavier = () => console.log("Heavier selected");
 
   return (
-    <div className="flex flex-1 flex-col px-12 py-16 max-w-screen-2xl w-full mx-auto">
-      <CategoryBadge category="size" />
+    <div className="flex flex-1 flex-col px-3 sm:px-8 lg:px-12 py-4 sm:py-8 lg:py-16 max-w-screen-2xl w-full mx-auto min-h-screen">
+      <div className="mb-4 sm:mb-6">
+        <CategoryBadge category="size" />
+      </div>
 
       <VSArena
         leftCard={{
@@ -56,7 +58,9 @@ export default function GamePage() {
         onHeavier={handleHeavier}
       />
 
-      <ProgressBar current={13} total={20} progress={65} unlockCount={7} />
+      <div className="mt-auto pt-4 sm:pt-6">
+        <ProgressBar current={13} total={20} progress={65} unlockCount={7} />
+      </div>
     </div>
   );
 }

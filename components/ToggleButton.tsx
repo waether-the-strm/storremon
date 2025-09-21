@@ -53,7 +53,7 @@ export function ToggleButton({
   return (
     <button
       onClick={onClick}
-      className={`w-32 px-6 py-4 rounded-xl transition-all duration-300 cursor-pointer border-2 ${
+      className={`w-24 sm:w-32 px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base rounded-xl transition-all duration-300 cursor-pointer border-2 ${
         isActive ? colors.active : colors.inactive
       } ${className}`}
     >
