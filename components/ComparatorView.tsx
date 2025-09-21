@@ -8,6 +8,7 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { ComparisonCard } from "./ComparisonCard";
+import { TinderCardStack } from "./TinderCardStack";
 import { ScaleSlider } from "./ScaleSlider";
 import { ToggleButtonGroup } from "./ToggleButtonGroup";
 import { useDebounce } from "../hooks/useDebounce";
@@ -271,60 +272,77 @@ export function ComparatorView({
             <h2 className="text-2xl font-semibold text-red-600 text-center sr-only">
               Pokémon
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {isPokemonLoading ? (
-                <p className="text-center col-span-full">Loading Pokémon...</p>
-              ) : pokemonData.length > 0 ? (
-                pokemonData.map((pokemon) => (
+            {isPokemonLoading ? (
+              <div className="flex items-center justify-center h-96">
+                <p className="text-center">Loading Pokémon...</p>
+              </div>
+            ) : isMobile ? (
+              // Mobile: Tinder-style card stack
+              <TinderCardStack
+                items={pokemonData.length > 0 ? pokemonData : []}
+                onCardSwipe={(direction, item) => {
+                  console.log(`Swiped ${direction}:`, item.name);
+                }}
+                onCardRemoved={(index, item) => {
+                  console.log(`Removed card ${index}:`, item.name);
+                }}
+                className="w-full"
+                threshold={100}
+                maxVisibleCards={3}
+              />
+            ) : (
+              // Desktop: Grid layout
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {pokemonData.length > 0 ? (
+                  pokemonData.map((pokemon) => (
+                    <ComparisonCard
+                      key={pokemon.name}
+                      imageUrl={pokemon.sprite}
+                      backImageUrl={pokemon.backSprite || undefined}
+                      title={
+                        pokemon.name.charAt(0).toUpperCase() +
+                        pokemon.name.slice(1)
+                      }
+                      subtitle={pokemon.types.slice(0, 2).join(" • ")}
+                      value={`${pokemon.height * 10}cm`}
+                      isRevealed={true}
+                      category={`#${pokemon.id.toString().padStart(3, "0")}`}
+                      badge={{ text: "POKÉ", variant: "pokemon" }}
+                      hasFlip={true}
+                      fallbackText={pokemon.name.charAt(0).toUpperCase()}
+                      metadata={{
+                        // FRONT: Basic info (max 2 for front display)
+                        type: pokemon.primaryType,
+                        gen: `Gen ${pokemon.generation}`,
+                        // BACK: Detailed info for horizontal bento grid
+                        weight: `${(pokemon.weight / 10).toFixed(1)}kg`,
+                        allTypes: pokemon.types.join(" • "),
+                        pokedexId: `#${pokemon.id.toString().padStart(3, "0")}`,
+                        category: pokemon.category,
+                      }}
+                    />
+                  ))
+                ) : (
                   <ComparisonCard
-                    key={pokemon.name}
-                    className={isMobile ? "snap-end" : ""}
-                    imageUrl={pokemon.sprite}
-                    backImageUrl={pokemon.backSprite || undefined}
-                    title={
-                      pokemon.name.charAt(0).toUpperCase() +
-                      pokemon.name.slice(1)
-                    }
-                    subtitle={pokemon.types.slice(0, 2).join(" • ")}
-                    value={`${pokemon.height * 10}cm`}
+                    imageUrl=""
+                    title="Mysterious Pokémon"
+                    subtitle="Invisible • Elusive"
+                    value="404cm"
                     isRevealed={true}
-                    category={`#${pokemon.id.toString().padStart(3, "0")}`}
+                    category="#404"
                     badge={{ text: "POKÉ", variant: "pokemon" }}
+                    fallbackText="( ͡° ͜ʖ ͡°)"
                     hasFlip={true}
-                    fallbackText={pokemon.name.charAt(0).toUpperCase()}
                     metadata={{
-                      // FRONT: Basic info (max 2 for front display)
-                      type: pokemon.primaryType,
-                      gen: `Gen ${pokemon.generation}`,
-                      // BACK: Detailed info for horizontal bento grid
-                      weight: `${(pokemon.weight / 10).toFixed(1)}kg`,
-                      allTypes: pokemon.types.join(" • "),
-                      pokedexId: `#${pokemon.id.toString().padStart(3, "0")}`,
-                      category: pokemon.category,
+                      type: "Unknown",
+                      gen: "Gen ?",
+                      status: "Hidden",
+                      ability: "Invisibility",
                     }}
                   />
-                ))
-              ) : (
-                <ComparisonCard
-                  className={isMobile ? "snap-end" : ""}
-                  imageUrl=""
-                  title="Mysterious Pokémon"
-                  subtitle="Invisible • Elusive"
-                  value="404cm"
-                  isRevealed={true}
-                  category="#404"
-                  badge={{ text: "POKÉ", variant: "pokemon" }}
-                  fallbackText="( ͡° ͜ʖ ͡°)"
-                  hasFlip={true}
-                  metadata={{
-                    type: "Unknown",
-                    gen: "Gen ?",
-                    status: "Hidden",
-                    ability: "Invisibility",
-                  }}
-                />
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -334,60 +352,75 @@ export function ComparatorView({
             <h2 className="text-2xl font-semibold text-blue-600 text-center sr-only">
               Museum Artifacts
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {isArtLoading ? (
-                <p className="text-center col-span-full">
-                  Loading Artifacts...
-                </p>
-              ) : artData.length > 0 ? (
-                artData.map((art) => (
+            {isArtLoading ? (
+              <div className="flex items-center justify-center h-96">
+                <p className="text-center">Loading Artifacts...</p>
+              </div>
+            ) : isMobile ? (
+              // Mobile: Tinder-style card stack
+              <TinderCardStack
+                items={artData.length > 0 ? artData : []}
+                onCardSwipe={(direction, item) => {
+                  console.log(`Swiped ${direction}:`, item.title);
+                }}
+                onCardRemoved={(index, item) => {
+                  console.log(`Removed card ${index}:`, item.title);
+                }}
+                className="w-full"
+                threshold={100}
+                maxVisibleCards={3}
+              />
+            ) : (
+              // Desktop: Grid layout
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {artData.length > 0 ? (
+                  artData.map((art) => (
+                    <ComparisonCard
+                      key={art.id}
+                      imageUrl={art.image}
+                      title={art.title}
+                      subtitle={art.artist || "Unknown Artist"}
+                      value={`${art.height}cm`}
+                      isRevealed={true}
+                      category={`#${art.id}`}
+                      badge={{ text: "ART", variant: "art" }}
+                      hasFlip={true}
+                      fallbackText={art.title.charAt(0).toUpperCase()}
+                      metadata={{
+                        // FRONT: Basic info
+                        period: art.date,
+                        artist: art.artist
+                          ? art.artist.split(" ").pop()
+                          : "Unknown",
+                        // BACK: Detailed info for bento grid
+                        dimensions: art.dimensions,
+                        fullArtist: art.artist || "Unknown Artist",
+                        artId: `#${art.id}`,
+                        category: "Museum Artifact",
+                      }}
+                    />
+                  ))
+                ) : (
                   <ComparisonCard
-                    key={art.id}
-                    className={isMobile ? "snap-end" : ""}
-                    imageUrl={art.image}
-                    title={art.title}
-                    subtitle={art.artist || "Unknown Artist"}
-                    value={`${art.height}cm`}
+                    imageUrl=""
+                    title="Lost Artwork"
+                    subtitle="Unknown Artist"
+                    value="∞cm"
                     isRevealed={true}
-                    category={`#${art.id}`}
+                    category="#404"
                     badge={{ text: "ART", variant: "art" }}
+                    fallbackText="(╯°□°）╯︵ ┻━┻"
                     hasFlip={true}
-                    fallbackText={art.title.charAt(0).toUpperCase()}
                     metadata={{
-                      // FRONT: Basic info
-                      period: art.date,
-                      artist: art.artist
-                        ? art.artist.split(" ").pop()
-                        : "Unknown",
-                      // BACK: Detailed info for bento grid
-                      dimensions: art.dimensions,
-                      fullArtist: art.artist || "Unknown Artist",
-                      artId: `#${art.id}`,
-                      category: "Museum Artifact",
+                      period: "Wifi Era",
+                      artist: "Unknown",
+                      status: "On a break",
+                      location: "Coffee Shop",
                     }}
                   />
-                ))
-              ) : (
-                <ComparisonCard
-                  className={isMobile ? "snap-end" : ""}
-                  imageUrl=""
-                  title="Lost Artwork"
-                  subtitle="Unknown Artist"
-                  value="∞cm"
-                  isRevealed={true}
-                  category="#404"
-                  badge={{ text: "ART", variant: "art" }}
-                  fallbackText="(╯°□°）╯︵ ┻━┻"
-                  hasFlip={true}
-                  metadata={{
-                    period: "Wifi Era",
-                    artist: "Unknown",
-                    status: "On a break",
-                    location: "Coffee Shop",
-                  }}
-                />
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
