@@ -24,8 +24,8 @@ export default function GamePage() {
   const handleHeavier = () => console.log("Heavier selected");
 
   return (
-    <div className="flex flex-1 flex-col px-3 sm:px-8 lg:px-12 py-4 sm:py-8 lg:py-16 max-w-screen-2xl w-full mx-auto min-h-screen">
-      <div className="mb-4 sm:mb-6">
+    <div className="flex flex-1 flex-col px-3 sm:px-8 lg:px-12 py-4 sm:py-8 lg:py-16 max-w-screen-2xl w-full mx-auto min-h-screen backdrop-blur-sm">
+      <div className="mb-4 sm:mb-6 relative z-10">
         <CategoryBadge category="size" />
       </div>
 
