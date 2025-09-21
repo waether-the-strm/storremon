@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
+import * as analytics from "@/lib/analytics";
 
 interface ScaleSliderProps {
   value: number;
@@ -46,6 +48,18 @@ export function ScaleSlider({
 }: ScaleSliderProps) {
   const [isInteracting, setIsInteracting] = useState(false);
   const [densityData, setDensityData] = useState<DensityData | null>(null);
+  const debouncedValue = useDebounce(value, 500); // Debounce value with 500ms delay
+
+  useEffect(() => {
+    // This effect runs when the debounced value changes.
+    // It will not run on every slider move, only after the user stops for 500ms.
+    analytics.event({
+      action: "slider_drag",
+      category: "interaction",
+      label: "Size Selector",
+      value: Math.round(debouncedValue),
+    });
+  }, [debouncedValue]);
 
   useEffect(() => {
     const fetchDensityData = async () => {

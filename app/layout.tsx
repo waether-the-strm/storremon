@@ -5,6 +5,7 @@ import { Background } from "@/components/Background";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Providers } from "@/components/Providers";
+import { Analytics } from "@/components/Analytics";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -110,6 +111,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased relative`}
       >
+        <Analytics />
         <Background />
         <Providers>
           <div className="relative flex min-h-screen flex-col z-20">
