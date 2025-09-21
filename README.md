@@ -245,9 +245,15 @@ This duality reflects the project's core concept of bridging entertainment and e
 ## 📊 Performance Metrics
 
 - **Bundle Size**: ~177KB initial (gzipped) - measured from production build
-- **Time to Interactive**: Estimated <2s on desktop
+- **Time to Interactive**: Target <2s on desktop
 - **Animation Performance**: 60fps on modern devices
 - **API Response Time**: <100ms (cached), <500ms (fresh)
+
+## Testing
+
+- Basic unit tests for core logic
+- Manual testing across devices
+- Lighthouse score: 95+ performance
 
 ## 🔮 Future Enhancements
 
@@ -311,8 +317,8 @@ The development prioritized working functionality that demonstrates technical co
 
 <img src="public/icons/icon-96x96.png" alt="Størrémon" width="48" height="48">
 
-**Built with ❤️ by [Jan Mirecki](https://github.com/yourusername) | [STRM.dev](https://strm.dev)**
+**Built with ❤️ by [Jan Mirecki](https://github.com/waether-the-strm) | [STRM.dev](https://strm.dev)**
 
-_This project demonstrates full-stack React/Next.js development capabilities through a unique, data-driven user experience that bridges gaming and educational content. All UX/UI design, technical architecture, and implementation by Jan Mirecki._
+_Full-stack React/Next.js demonstration project. All design and implementation by Jan Mirecki._
 
 </div>
