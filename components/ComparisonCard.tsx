@@ -150,22 +150,26 @@ export function ComparisonCard({
 
               {/* Image container with fallback text */}
               <div className="relative z-10 w-full h-full flex items-center justify-center p-3">
-                <img
-                  src={imageUrl}
-                  alt={title}
-                  className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                    const fallbackDiv = e.currentTarget
-                      .nextElementSibling as HTMLElement;
-                    if (fallbackDiv) {
-                      fallbackDiv.style.display = "flex";
-                    }
-                  }}
-                />
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt={title}
+                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      const fallbackDiv = e.currentTarget
+                        .nextElementSibling as HTMLElement;
+                      if (fallbackDiv) {
+                        fallbackDiv.style.display = "flex";
+                      }
+                    }}
+                  />
+                ) : null}
                 <div
-                  className="hidden w-full h-full items-center justify-center text-2xl leading-none transition-transform duration-300 group-hover:scale-105"
-                  style={{ display: "none" }}
+                  className={`w-full h-full items-center justify-center text-2xl leading-none transition-transform duration-300 group-hover:scale-105 ${
+                    imageUrl ? "hidden" : "flex"
+                  }`}
+                  style={imageUrl ? { display: "none" } : {}}
                 >
                   {fallbackText || title}
                 </div>

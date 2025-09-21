@@ -307,7 +307,7 @@ export function ComparatorView({
               ) : (
                 <ComparisonCard
                   className={isMobile ? "snap-end" : ""}
-                  imageUrl="invalid-url-to-trigger-fallback"
+                  imageUrl=""
                   title="Mysterious Pokémon"
                   subtitle="Invisible • Elusive"
                   value="404cm"
@@ -370,7 +370,7 @@ export function ComparatorView({
               ) : (
                 <ComparisonCard
                   className={isMobile ? "snap-end" : ""}
-                  imageUrl="invalid-url-to-trigger-fallback"
+                  imageUrl=""
                   title="Lost Artwork"
                   subtitle="Unknown Artist"
                   value="∞cm"

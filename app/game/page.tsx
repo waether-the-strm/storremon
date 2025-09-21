@@ -11,9 +11,6 @@ export default function GamePage() {
   const { data, isLoading, isError } = usePokemonData(50); // Hardcoded size for now
 
   useEffect(() => {
-    if (data) {
-      console.log("Fetched data:", data);
-    }
     if (isError) {
       console.error("Error fetching data:", isError);
     }
