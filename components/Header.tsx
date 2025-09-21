@@ -130,7 +130,7 @@ export function Header() {
         {/* Center content slot for size info on explorer page */}
         {pathname === "/" && context?.sizeInfo && (
           <motion.div
-            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 backdrop-blur-md z-10"
+            className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 backdrop-blur-md z-10 pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: context.isHovering ? 1 : 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
