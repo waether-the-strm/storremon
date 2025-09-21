@@ -361,3 +361,19 @@ body {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+
+.mask-gradient-right {
+  mask-image: linear-gradient(to right, black 90%, transparent 100%);
+}
+.mask-gradient-left {
+  mask-image: linear-gradient(to left, black 90%, transparent 100%);
+}
+.mask-gradient-both {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+}
