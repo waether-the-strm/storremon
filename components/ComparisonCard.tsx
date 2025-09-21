@@ -104,7 +104,7 @@ export function ComparisonCard({
         {/* FRONT SIDE */}
         <div
           className={`
-            absolute inset-0 w-full h-full bg-card sm:bg-card/80 sm:backdrop-blur-sm border border-border rounded-3xl 
+            absolute inset-0 w-full h-full bg-card/80 backdrop-blur-sm border border-border rounded-3xl 
             flex flex-col transition-all duration-300 ease-out overflow-hidden group backface-hidden
             will-change-transform
             hover:bg-card-hover hover:border-card-border-glow hover:shadow-lg 
@@ -251,7 +251,7 @@ export function ComparisonCard({
         {hasFlip && (
           <div
             className={`
-              absolute inset-0 w-full h-[420px] bg-card sm:bg-card/90 sm:backdrop-blur-sm border border-border rounded-3xl 
+              absolute inset-0 w-full h-[420px] bg-card/90 backdrop-blur-sm border border-border rounded-3xl 
               flex flex-col transition-all duration-300 ease-out overflow-hidden group backface-hidden rotate-y-180
               will-change-transform
               hover:bg-card-hover hover:border-card-border-glow hover:shadow-lg
