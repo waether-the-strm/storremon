@@ -241,12 +241,12 @@ export function ComparatorView({
       {/* Header section with title and controls that fade on scroll */}
       <motion.div
         ref={motionDivRef}
-        className={`sticky top-36 flex flex-col items-center space-y-4 mb-16`}
+        className={`sticky top-36 flex flex-col items-center space-y-4 mb-5`}
         style={{ opacity, scale }}
       >
         <h1 className="text-3xl font-bold text-center">Størrémon</h1>
         {/* Category Toggle Header */}
-        <div className="flex flex-col items-center space-y-4 mb-16 gap-8">
+        <div className="flex flex-col items-center space-y-4 mb-8 gap-8">
           <ToggleButtonGroup
             options={toggleOptions}
             activeOptions={activeOptions}
@@ -257,6 +257,16 @@ export function ComparatorView({
             Use the slider to find objects of specific dimensions. Toggle
             between Pokémon and Museum artifacts.
           </p>
+
+          {/* Large Size Display */}
+          <div className="mt-4 text-center">
+            <div className="text-4xl sm:text-5xl font-bold text-white/95 mb-2 font-mono tracking-wider">
+              {formatSize(valueToSizeCm(sliderValue))}
+            </div>
+            <div className="text-xs sm:text-sm text-gray-400/70">
+              {getScaleLabel(sliderValue)} scale
+            </div>
+          </div>
         </div>
       </motion.div>
 

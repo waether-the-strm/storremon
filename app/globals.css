@@ -377,3 +377,81 @@ body {
     transparent 100%
   );
 }
+
+.snap-container-mobile {
+  scroll-snap-type: y mandatory;
+}
+
+/* Custom Slider Styles - Thick Track */
+.slider-custom-thick {
+  height: 24px; /* Height matches the visual track */
+  -webkit-appearance: none;
+  background-color: transparent; /* Transparent to show custom track */
+}
+
+/* --- HIDE DEFAULT THUMB FOR THICK SLIDER --- */
+/* Chrome, Safari, Opera */
+.slider-custom-thick::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px; /* Match physical thumb width */
+  height: 48px; /* Match physical thumb height */
+  background: transparent; /* Hide original thumb */
+  cursor: pointer;
+  border-radius: 8px;
+  margin-top: -12px; /* Center on track */
+}
+
+/* Firefox */
+.slider-custom-thick::-moz-range-thumb {
+  width: 32px; /* Match physical thumb width */
+  height: 48px; /* Match physical thumb height */
+  background: transparent; /* Hide original thumb */
+  cursor: pointer;
+  border-radius: 8px;
+  border: none;
+  margin-top: -12px; /* Center on track */
+}
+
+/* Track styling for Firefox */
+.slider-custom-thick::-moz-range-track {
+  background: transparent;
+  height: 24px;
+  border-radius: 8px;
+  border: none;
+}
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .hover\:rotate-y-\[-8deg\]:hover {
+    transform: translateY(-4px) rotateY(-8deg) rotateX(2deg);
+  }
+  .hover\:rotate-y-\[8deg\]:hover {
+    transform: translateY(-4px) rotateY(8deg) rotateX(2deg);
+  }
+  .transform-style-preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 3s linear infinite;
+  }
+}

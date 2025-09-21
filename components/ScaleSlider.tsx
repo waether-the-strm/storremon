@@ -89,67 +89,64 @@ export function ScaleSlider({
     return formatSize(sizeInCm);
   };
 
-  // Generate density heatmap as full background gradient
-  const generateHeatmapBackground = () => {
+  // Generate line chart data points
+  const generateChartData = () => {
     if (!densityData) {
-      // Return a transparent gradient while data is loading
       return {
-        redGradient: "linear-gradient(90deg, transparent, transparent)",
-        blueGradient: "linear-gradient(90deg, transparent, transparent)",
+        pokemonPoints: [],
+        museumPoints: [],
       };
     }
 
-    const calculateDensityPoints = (heights: number[]) => {
+    const calculateChartPoints = (heights: number[]) => {
       if (heights.length === 0) return [];
 
-      const points = Array.from({ length: 21 }, (_, i) => ({
-        position: i * 5,
+      // Create data points for every 2% of the slider (50 points total)
+      const points = Array.from({ length: 51 }, (_, i) => ({
+        position: i * 2, // 0, 2, 4, 6, ... 100
         count: 0,
       }));
 
       heights.forEach((height) => {
         const sliderVal = cmToSliderValue(height);
-        const index = Math.round(sliderVal / 5);
+        const index = Math.round(sliderVal / 2);
         if (points[index]) {
           points[index].count++;
         }
       });
 
-      const maxCount = Math.max(...points.map((p) => p.count), 1);
+      // Smooth the data with a simple moving average
+      const smoothedPoints = points.map((point, index) => {
+        const range = 2; // Look 2 points in each direction
+        let sum = 0;
+        let count = 0;
 
-      return points.map((p) => ({
-        position: p.position,
-        density: Math.sqrt(p.count / maxCount), // Use sqrt for better visual spread
+        for (
+          let i = Math.max(0, index - range);
+          i <= Math.min(points.length - 1, index + range);
+          i++
+        ) {
+          sum += points[i].count;
+          count++;
+        }
+
+        return {
+          x: point.position,
+          y: sum / count,
+        };
+      });
+
+      // Normalize to 0-100 scale for chart height
+      const maxCount = Math.max(...smoothedPoints.map((p) => p.y), 1);
+      return smoothedPoints.map((p) => ({
+        x: p.x,
+        y: (p.y / maxCount) * 100, // Scale to 0-100
       }));
     };
 
-    const pokemonDensityPoints = calculateDensityPoints(densityData.pokemon);
-    const museumDensityPoints = calculateDensityPoints(densityData.museum);
-
-    const createGradient = (densityPoints: any[]) => {
-      if (densityPoints.length === 0) return "transparent";
-      const stops = densityPoints
-        .map((point) => {
-          const alpha = 0.1 + point.density * 0.7;
-          return `rgba(239, 68, 68, ${alpha}) ${point.position}%`;
-        })
-        .join(", ");
-      return `linear-gradient(90deg, ${stops})`;
-    };
-    const createBlueGradient = (densityPoints: any[]) => {
-      if (densityPoints.length === 0) return "transparent";
-      const stops = densityPoints
-        .map((point) => {
-          const alpha = 0.1 + point.density * 0.7;
-          return `rgba(59, 130, 246, ${alpha}) ${point.position}%`;
-        })
-        .join(", ");
-      return `linear-gradient(90deg, ${stops})`;
-    };
-
     return {
-      redGradient: createGradient(pokemonDensityPoints),
-      blueGradient: createBlueGradient(museumDensityPoints),
+      pokemonPoints: calculateChartPoints(densityData.pokemon),
+      museumPoints: calculateChartPoints(densityData.museum),
     };
   };
 
@@ -166,88 +163,203 @@ export function ScaleSlider({
   const labels = ["Micro", "Tiny", "Human-sized", "Large", "Colossal"];
   const currentLabel = getScaleLabel(value);
 
+  // Separate state for dragging to control the thumb's appearance
+  const [isDragging, setIsDragging] = useState(false);
+
   return (
     <div
       className={`flex w-full flex-col items-center space-y-3 sm:space-y-6 ${className}`}
     >
-      {/* Slider Container with matching styling */}
+      {/* Line Chart */}
       <div className="w-full max-w-2xl">
-        <div
-          className="relative flex items-center bg-gray-500/10 backdrop-blur-xs rounded-3xl p-3 sm:p-6 shadow-inner overflow-hidden"
-          onPointerEnter={() => setIsInteracting(true)}
-          onPointerLeave={() => setIsInteracting(false)}
-          onPointerDown={() => setIsInteracting(true)}
-          onPointerUp={() => setIsInteracting(false)}
-        >
-          {/* Scale Boundary Lines */}
-          <div className="absolute top-0 bottom-0 left-3 sm:left-6 right-3 sm:right-6 pointer-events-none">
-            {[1, 50, 220, 1000].map((cm) => (
-              <div
-                key={cm}
-                className="absolute top-0 w-0.5 h-full bg-black/30"
-                style={{ left: `${cmToSliderValue(cm)}%` }}
-              />
-            ))}
+        <div className="relative w-full h-6 rounded-lg border-2 border-gray-800 shadow-inner bg-black/20">
+          {/* Scale indicator lines */}
+          {[1, 50, 220, 1000].map((cm) => (
+            <div
+              key={cm}
+              className="absolute top-0 bottom-0 w-px bg-white/20 pointer-events-none"
+              style={{ left: `${cmToSliderValue(cm)}%` }}
+            />
+          ))}
+
+          <svg
+            className="w-full h-full"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            style={{
+              transform: "scaleY(-1)",
+              mixBlendMode: "screen",
+            }}
+          >
+            {/* Pokemon Line (Red) */}
+            {(() => {
+              const { pokemonPoints } = generateChartData();
+              if (pokemonPoints.length > 1) {
+                const pathData = pokemonPoints
+                  .map(
+                    (point, index) =>
+                      `${index === 0 ? "M" : "L"} ${point.x} ${Math.max(
+                        5,
+                        point.y
+                      )}`
+                  )
+                  .join(" ");
+
+                return (
+                  <>
+                    <path
+                      d={`${pathData} L ${
+                        pokemonPoints[pokemonPoints.length - 1].x
+                      } 0 L ${pokemonPoints[0].x} 0 Z`}
+                      fill="rgba(239, 68, 68, 0.6)"
+                      stroke="none"
+                    />
+                    <path
+                      d={pathData}
+                      fill="none"
+                      stroke="rgb(239, 68, 68)"
+                      strokeWidth="1"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </>
+                );
+              }
+              return null;
+            })()}
+
+            {/* Museum Line (Blue) */}
+            {(() => {
+              const { museumPoints } = generateChartData();
+              if (museumPoints.length > 1) {
+                const pathData = museumPoints
+                  .map(
+                    (point, index) =>
+                      `${index === 0 ? "M" : "L"} ${point.x} ${Math.max(
+                        5,
+                        point.y
+                      )}`
+                  )
+                  .join(" ");
+
+                return (
+                  <>
+                    <path
+                      d={`${pathData} L ${
+                        museumPoints[museumPoints.length - 1].x
+                      } 0 L ${museumPoints[0].x} 0 Z`}
+                      fill="rgba(59, 130, 246, 0.6)"
+                      stroke="none"
+                    />
+                    <path
+                      d={pathData}
+                      fill="none"
+                      stroke="rgb(59, 130, 246)"
+                      strokeWidth="1"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </>
+                );
+              }
+              return null;
+            })()}
+          </svg>
+
+          {/* Position Indicator - dark, extending beyond chart */}
+          <div
+            className="absolute -top-2 -bottom-2 flex flex-col items-center justify-between pointer-events-none transition-all duration-150 ease-out z-10"
+            style={{
+              left: `${value}%`,
+              transform: "translateX(-50%)",
+            }}
+          >
+            {/* Top dot */}
+            <div className="w-2 h-2 bg-gray-800 rounded-full border border-gray-600 shadow-md"></div>
+
+            {/* Vertical line */}
+            <div className="w-0.5 flex-1 bg-gray-800 mx-auto shadow-sm"></div>
+
+            {/* Bottom dot */}
+            <div className="w-2 h-2 bg-gray-800 rounded-full border border-gray-600 shadow-md"></div>
           </div>
-          {/* Custom Slider Track with Heatmap Background */}
+
+          {/* Hidden input for interaction */}
           <input
             type="range"
             min="0"
             max="100"
             value={value}
             onChange={(e) => handleChange(Number(e.target.value))}
-            className={`w-full rounded-full appearance-none cursor-pointer slider-custom ${
-              isInteracting ? "thumb-active" : ""
-            }`}
-            style={{
-              backgroundImage: `${generateHeatmapBackground().redGradient}, ${
-                generateHeatmapBackground().blueGradient
-              }`,
-              backgroundSize: "100% 50%",
-              backgroundPosition: "top, bottom",
-              backgroundRepeat: "no-repeat",
-            }}
+            className="absolute inset-0 w-full h-full appearance-none bg-transparent cursor-pointer opacity-0"
           />
-
-          {/* Tooltip - only show on hover */}
-          {isInteracting && (
-            <div
-              className="absolute -top-12 transform -translate-x-1/2 bg-gray-900/90 text-white text-xs px-3 py-2 rounded-lg transition-opacity duration-200 pointer-events-none"
-              style={{ left: `${value}%` }}
-            >
-              {valueToSize(value)}
-              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900/90"></div>
-            </div>
-          )}
         </div>
 
-        {/* Scale Labels */}
-        <div className="relative mt-2 sm:mt-4 flex w-full justify-between text-xs sm:text-sm px-1">
-          {labels.map((label) => (
-            <span
-              key={label}
-              className={`transition-colors duration-200 ${
-                currentLabel.startsWith(label)
-                  ? "text-white/90 font-medium"
-                  : "text-gray-400/60"
-              }`}
-            >
-              {label}
-            </span>
-          ))}
-        </div>
+        {/* Scale Labels with angled indicator lines */}
+        <div className="relative mt-2 sm:mt-4">
+          {/* Angled lines pointing from labels to chart positions */}
+          <div className="absolute -top-2 sm:-top-4 left-0 right-0 h-2 sm:h-4 pointer-events-none">
+            {[
+              { cm: 0.11, labelIndex: 0 }, // Micro (starts at 0.1cm)
+              { cm: 1.03, labelIndex: 1 }, // Tiny (starts at 1cm)
+              { cm: 50, labelIndex: 2 }, // Human-sized (starts at 50cm)
+              { cm: 220, labelIndex: 3 }, // Large (starts at 220cm)
+              { cm: 1000, labelIndex: 4 }, // Colossal (starts at 1000cm)
+            ].map(({ cm, labelIndex }) => {
+              const chartPosition = cmToSliderValue(cm);
+              let labelPosition = (labelIndex / (labels.length - 1)) * 100; // 0%, 25%, 50%, 75%, 100%
 
-        {/* Current Scale Display */}
-        {showDescription && (
-          <div className="mt-2 sm:mt-4 text-center">
-            <div className="text-base sm:text-lg font-semibold text-white/90">
-              Size: {valueToSize(value)}
-            </div>
-            <div className="text-xs sm:text-sm text-gray-400/80 mt-1">
-              {getScaleLabel(value)} • Finding objects of this size...
-            </div>
+              // Adjust label positions for better centering
+              if (labelIndex === 0) {
+                // Micro - move right
+                labelPosition = Math.min(labelPosition + 4, 100);
+              } else if (labelIndex === 4) {
+                // Colossal - move left
+                labelPosition = Math.max(labelPosition - 4, 0);
+              }
+
+              // Check if this is the currently active scale
+              const label = labels[labelIndex];
+              const isActive = currentLabel.startsWith(label);
+
+              return (
+                <svg
+                  key={cm}
+                  className="absolute inset-0 w-full h-full"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                >
+                  <line
+                    x1={labelPosition}
+                    y1="100"
+                    x2={chartPosition}
+                    y2="0"
+                    stroke={
+                      isActive
+                        ? "rgba(255, 255, 255, 0.7)"
+                        : "rgba(255, 255, 255, 0.2)"
+                    }
+                    strokeWidth={isActive ? "1" : "0.5"}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </svg>
+              );
+            })}
           </div>
-        )}
+
+          <div className="flex w-full justify-between text-xs sm:text-sm px-1">
+            {labels.map((label) => (
+              <span
+                key={label}
+                className={`transition-colors duration-200 ${
+                  currentLabel.startsWith(label)
+                    ? "text-white/90 font-medium"
+                    : "text-gray-400/60"
+                }`}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
