@@ -56,9 +56,9 @@ export const metadata: Metadata = {
     siteName: "Størrémon",
     images: [
       {
-        url: "/thumbnails/og-image-1200x630.png",
-        width: 1200,
-        height: 630,
+        url: "/storremon-cover.png",
+        width: 1344,
+        height: 768,
         alt: "Størrémon - Pokémon vs Museum Art comparison",
       },
     ],
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     title: "Størrémon - Compare Pokémon & Museum Artifacts by Size",
     description:
       "Discover surprising size similarities between Pokémon and classical museum artifacts.",
-    images: ["/thumbnails/twitter-image-1200x675.png"],
+    images: ["/storremon-cover.png"],
     creator: "@storremon",
   },
   robots: {
