@@ -51,8 +51,10 @@ export function ScaleSlider({
   showArt = true,
 }: ScaleSliderProps) {
   const [isInteracting, setIsInteracting] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [densityData, setDensityData] = useState<DensityData | null>(null);
   const debouncedValue = useDebounce(value, 500); // Debounce value with 500ms delay
+  const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     // This effect runs when the debounced value changes.
@@ -86,6 +88,17 @@ export function ScaleSlider({
 
   const handleChange = (newValue: number) => {
     onChange(newValue);
+    setShowTooltip(true);
+
+    // Clear previous timeout
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
+
+    // Hide tooltip after 1.5 seconds of no interaction
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setShowTooltip(false);
+    }, 1500);
   };
 
   const valueToSize = (val: number) => {
@@ -288,6 +301,15 @@ export function ScaleSlider({
               transform: "translateX(-50%)",
             }}
           >
+            {/* Value tooltip */}
+            {showTooltip && (
+              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 transition-all duration-300 ease-out">
+                <div className="bg-black/30 text-gray-200/70 text-xs font-mono px-2 py-1 rounded shadow-lg border border-gray-900">
+                  {valueToSize(value)}
+                </div>
+              </div>
+            )}
+
             {/* Top dot */}
             <div className="w-2 h-2 bg-gray-800 rounded-full border border-gray-600 shadow-md"></div>
 
