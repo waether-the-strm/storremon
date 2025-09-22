@@ -3,35 +3,50 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BarChart3 } from "lucide-react";
-import { useContext, createContext, useState, useEffect } from "react";
+import { useContext, createContext, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-const NavLink = ({
+function NavItem({
   href,
-  isActive,
   children,
+  className,
+  isActive,
+  onMouseEnter,
+  onMouseLeave,
+  navRef,
 }: {
   href: string;
-  isActive?: boolean;
   children: React.ReactNode;
-}) => (
-  <Link
-    href={href}
-    className={`relative text-sm font-medium transition-colors hover:text-foreground ${
-      isActive ? "text-foreground" : "text-foreground-tertiary"
-    }`}
-    data-active={isActive}
-  >
-    {children}
-    {isActive && (
-      <motion.span
-        className="absolute -bottom-7 left-0 right-0 h-px bg-primary"
-        layoutId="active-nav-underline"
-        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-      />
-    )}
-  </Link>
-);
+  className?: string;
+  isActive: boolean;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  navRef: (el: HTMLDivElement | null) => void;
+}) {
+  return (
+    <div ref={navRef} className="flex-grow h-full flex items-center">
+      <Link
+        href={href}
+        className={cn(
+          "group relative text-sm font-medium transition-colors hover:text-foreground w-full h-full flex items-center",
+          isActive ? "text-foreground" : "text-foreground-tertiary",
+          className
+        )}
+        data-active={isActive}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
+        {children}
+      </Link>
+    </div>
+  );
+}
+
+const navItems = [
+  { href: "/", label: "Explorer" },
+  { href: "/game", label: "Game" },
+];
 
 type SizeInfo = { size: string; category: string } | null;
 
@@ -54,11 +69,17 @@ export function Header() {
   const [showMobileStats, setShowMobileStats] = useState(false);
   const [showDesktopStats, setShowDesktopStats] = useState(true);
   const [isHoveringNav, setIsHoveringNav] = useState(false);
+  const [hoveredNavItem, setHoveredNavItem] = useState<string | null>(null);
+  const navItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const setNavItemRef = (href: string) => (el: HTMLDivElement | null) => {
+    navItemRefs.current[href] = el;
+  };
 
   // Auto-hide mobile nav after 3 seconds (only if not hovering)
   useEffect(() => {
@@ -146,7 +167,7 @@ export function Header() {
           </motion.div>
         )}
 
-        <div className="flex items-center gap-4 sm:gap-10 lg:gap-14">
+        <div className="flex h-full items-center gap-4 sm:gap-10 lg:gap-14">
           {/* Logo section */}
           <div className="relative mobile-nav-container">
             <Link
@@ -215,13 +236,50 @@ export function Header() {
           </div>
 
           {/* Navigation section - hidden on mobile */}
-          <nav className="hidden sm:flex gap-4 sm:gap-6 lg:gap-10">
-            <NavLink href="/" isActive={pathname === "/"}>
-              Explorer
-            </NavLink>
-            <NavLink href="/game" isActive={pathname === "/game"}>
-              Game
-            </NavLink>
+          <nav className="hidden h-full sm:flex gap-4 sm:gap-6 lg:gap-10 relative">
+            {navItems.map((item) => (
+              <NavItem
+                key={item.href}
+                href={item.href}
+                isActive={pathname === item.href}
+                onMouseEnter={() => setHoveredNavItem(item.href)}
+                onMouseLeave={() => setHoveredNavItem(null)}
+                navRef={setNavItemRef(item.href)}
+              >
+                {item.label}
+              </NavItem>
+            ))}
+
+            {/* Shared underline element */}
+            <motion.span
+              className="absolute bottom-0 h-px bg-primary"
+              layoutId="nav-underline"
+              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              animate={{
+                opacity:
+                  pathname === "/" || pathname === "/game" || hoveredNavItem
+                    ? 1
+                    : 0,
+                x: (() => {
+                  const targetHref =
+                    hoveredNavItem ||
+                    (pathname === "/" || pathname === "/game"
+                      ? pathname
+                      : null);
+                  if (!targetHref || !navItemRefs.current[targetHref]) return 0;
+                  return navItemRefs.current[targetHref].offsetLeft;
+                })(),
+                width: (() => {
+                  const targetHref =
+                    hoveredNavItem ||
+                    (pathname === "/" || pathname === "/game"
+                      ? pathname
+                      : null);
+                  if (!targetHref || !navItemRefs.current[targetHref]) return 0;
+                  return navItemRefs.current[targetHref].offsetWidth;
+                })(),
+              }}
+            />
           </nav>
         </div>
 
