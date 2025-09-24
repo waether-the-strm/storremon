@@ -9,11 +9,16 @@ import {
 } from "framer-motion";
 import { ComparisonCard } from "./ComparisonCard";
 import { TinderCardStack } from "./TinderCardStack";
-import { ScaleSlider } from "./ScaleSlider";
+import { ScaleSlider } from "./scale-slider";
 import { ToggleButtonGroup } from "./ToggleButtonGroup";
 import { useDebounce } from "../hooks/useDebounce";
 import { SizeContext } from "./Header";
 import { emptyArtCardProps, emptyPokemonCardProps } from "./empty-card-data";
+import {
+  sliderValueToCm,
+  formatSize,
+  getScaleLabel,
+} from "../lib/scale-calculations";
 
 export interface Pokemon {
   id: number;
@@ -37,29 +42,6 @@ export interface Art {
   dimensions: string;
   image: string;
 }
-
-// It's better to have this utility function outside or passed as a prop
-// if it's needed in multiple places. For now, let's define it here.
-const valueToSizeCm = (val: number): number => {
-  const minLog = Math.log(0.1); // 0.1cm
-  const maxLog = Math.log(3000); // 30m = 3000cm, increased range
-  const logValue = minLog + (val / 100) * (maxLog - minLog);
-  return Math.exp(logValue);
-};
-
-const formatSize = (cm: number) => {
-  return `${cm.toFixed(1)}cm`;
-};
-
-const getScaleLabel = (val: number) => {
-  const sizeInCm = valueToSizeCm(val);
-
-  if (sizeInCm < 1) return "Microscopic";
-  if (sizeInCm < 50) return "Tiny";
-  if (sizeInCm < 220) return "Human-sized";
-  if (sizeInCm < 1000) return "Large";
-  return "Colossal";
-};
 
 interface ComparatorViewProps {
   className?: string;
@@ -103,7 +85,7 @@ export function ComparatorView({
 
   useEffect(() => {
     const fetchData = async () => {
-      const sizeInCm = valueToSizeCm(debouncedSliderValue);
+      const sizeInCm = sliderValueToCm(debouncedSliderValue);
 
       if (showPokemon) {
         setIsPokemonLoading(true);
@@ -174,7 +156,7 @@ export function ComparatorView({
   // Update global size info from context
   useEffect(() => {
     if (!context?.setSizeInfo) return;
-    const size = formatSize(valueToSizeCm(sliderValue));
+    const size = formatSize(sliderValueToCm(sliderValue));
     const category = `${getScaleLabel(
       sliderValue
     )} • Finding objects of this size...`;
@@ -261,7 +243,7 @@ export function ComparatorView({
           {/* Large Size Display */}
           <div className="mt-4 text-center">
             <div className="text-4xl sm:text-5xl font-bold text-white/95 mb-2 font-mono tracking-wider">
-              {Math.round(valueToSizeCm(sliderValue))}cm
+              {Math.round(sliderValueToCm(sliderValue))}cm
             </div>
             <div className="text-xs sm:text-sm text-gray-400/70">
               {getScaleLabel(sliderValue)} scale
