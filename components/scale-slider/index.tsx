@@ -19,6 +19,10 @@ interface ScaleSliderProps {
   showDescription?: boolean;
   showPokemon?: boolean;
   showArt?: boolean;
+  onLoadingChange?: (loadingStates: {
+    pokemon: boolean;
+    museum: boolean;
+  }) => void;
 }
 
 interface DensityData {
@@ -35,6 +39,7 @@ export function ScaleSlider({
   showDescription = true,
   showPokemon = true,
   showArt = true,
+  onLoadingChange,
 }: ScaleSliderProps) {
   const [isInteracting, setIsInteracting] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -101,6 +106,14 @@ export function ScaleSlider({
       setMuseumLoading
     );
   }, []);
+
+  // Notify parent component about loading state changes
+  useEffect(() => {
+    onLoadingChange?.({
+      pokemon: pokemonLoading,
+      museum: museumLoading,
+    });
+  }, [pokemonLoading, museumLoading, onLoadingChange]);
 
   // Animation loop for loading waves
   useEffect(() => {

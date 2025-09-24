@@ -18,11 +18,13 @@ interface LoadingProgress {
 interface UseLoadingProgressOptions {
   type: LoadingType;
   onComplete?: () => void;
+  shouldStop?: boolean; // External control to stop the progress
 }
 
 export const useLoadingProgress = ({
   type,
   onComplete,
+  shouldStop = false,
 }: UseLoadingProgressOptions): LoadingProgress => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -81,6 +83,20 @@ export const useLoadingProgress = ({
       intervalRef.current = null;
     }
   };
+
+  // Stop loading when shouldStop becomes true
+  useEffect(() => {
+    if (shouldStop && isLoading) {
+      setProgress(100);
+      setIsLoading(false);
+      onComplete?.();
+
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+  }, [shouldStop, isLoading, onComplete]);
 
   // Cleanup on unmount
   useEffect(() => {

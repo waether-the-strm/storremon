@@ -65,16 +65,23 @@ export function ComparatorView({
   const [isMobile, setIsMobile] = useState(false);
   const [isPokemonLoading, setIsPokemonLoading] = useState(false);
   const [isArtLoading, setIsArtLoading] = useState(false);
+  const [scaleSliderLoading, setScaleSliderLoading] = useState({
+    pokemon: true,
+    museum: true,
+  });
   const context = useContext(SizeContext);
 
   // Loading progress tracking
+  const [pokemonApiComplete, setPokemonApiComplete] = useState(false);
+  const [artApiComplete, setArtApiComplete] = useState(false);
+
   const pokemonProgress = useLoadingProgress({
     type: "pokemon",
-    onComplete: () => setIsPokemonLoading(false),
+    shouldStop: pokemonApiComplete,
   });
   const artProgress = useLoadingProgress({
     type: "museum",
-    onComplete: () => setIsArtLoading(false),
+    shouldStop: artApiComplete,
   });
 
   useEffect(() => {
@@ -100,6 +107,7 @@ export function ComparatorView({
 
       if (showPokemon) {
         setIsPokemonLoading(true);
+        setPokemonApiComplete(false);
         pokemonProgress.startLoading();
         try {
           // Pokemon height is in decimeters, so we convert cm to dm
@@ -112,14 +120,17 @@ export function ComparatorView({
           console.error("Failed to fetch Pokemon data:", error);
           setPokemonData([]); // Clear data on error
         } finally {
-          pokemonProgress.stopLoading();
+          setPokemonApiComplete(true);
+          setIsPokemonLoading(false);
         }
       } else {
         setPokemonData([]);
+        setPokemonApiComplete(false);
       }
 
       if (showArt) {
         setIsArtLoading(true);
+        setArtApiComplete(false);
         artProgress.startLoading();
         try {
           const size = Math.round(sizeInCm);
@@ -131,10 +142,12 @@ export function ComparatorView({
           console.error("Failed to fetch Art data:", error);
           setArtData([]); // Clear data on error
         } finally {
-          artProgress.stopLoading();
+          setArtApiComplete(true);
+          setIsArtLoading(false);
         }
       } else {
         setArtData([]);
+        setArtApiComplete(false);
       }
     };
 
@@ -248,11 +261,12 @@ export function ComparatorView({
             onToggle={handleToggle}
             loadingStates={{
               pokemon: {
-                isLoading: pokemonProgress.isLoading,
+                isLoading:
+                  pokemonProgress.isLoading || scaleSliderLoading.pokemon,
                 progress: pokemonProgress.progress,
               },
               art: {
-                isLoading: artProgress.isLoading,
+                isLoading: artProgress.isLoading || scaleSliderLoading.museum,
                 progress: artProgress.progress,
               },
             }}
@@ -294,6 +308,7 @@ export function ComparatorView({
           showDescription={false}
           showPokemon={showPokemon}
           showArt={showArt}
+          onLoadingChange={setScaleSliderLoading}
         />
       </motion.div>
       {/* Two-panel Layout */}
