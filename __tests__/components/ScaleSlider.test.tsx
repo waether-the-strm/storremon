@@ -7,7 +7,7 @@ import {
   act,
 } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ScaleSlider } from "@/components/ScaleSlider";
+import { ScaleSlider } from "@/components/scale-slider";
 
 // Mock fetch for density data
 const mockFetch = vi.fn();
@@ -21,13 +21,12 @@ describe("ScaleSlider", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    // Mock successful fetch response for density data
+    // Mock successful fetch response for both pokemon and museum density data
     mockFetch.mockResolvedValue({
       ok: true,
       json: () =>
         Promise.resolve({
-          pokemon: [10, 20, 50, 100, 200],
-          museum: [15, 30, 75, 150, 300],
+          heights: [10, 20, 50, 100, 200],
         }),
     });
   });
@@ -96,7 +95,8 @@ describe("ScaleSlider", () => {
     render(<ScaleSlider {...defaultProps} />);
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith("/api/density-map");
+      expect(mockFetch).toHaveBeenCalledWith("/api/density-map/pokemon");
+      expect(mockFetch).toHaveBeenCalledWith("/api/density-map/museum");
     });
   });
 
@@ -108,7 +108,8 @@ describe("ScaleSlider", () => {
     });
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith("/api/density-map");
+      expect(mockFetch).toHaveBeenCalledWith("/api/density-map/pokemon");
+      expect(mockFetch).toHaveBeenCalledWith("/api/density-map/museum");
     });
 
     // Component should still render even if fetch fails

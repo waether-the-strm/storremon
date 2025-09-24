@@ -1,38 +1,10 @@
 import { describe, it, expect } from "vitest";
-
-// Extract the mathematical functions from ScaleSlider for testing
-const MIN_LOG = Math.log(0.1); // 0.1cm
-const MAX_LOG = Math.log(3000); // 30m = 3000cm
-
-// Convert slider value (0-100) to real size in cm
-const sliderValueToCm = (val: number) => {
-  const logValue = MIN_LOG + (val / 100) * (MAX_LOG - MIN_LOG);
-  return Math.exp(logValue);
-};
-
-// Convert real size in cm to slider value (0-100)
-const cmToSliderValue = (cm: number) => {
-  if (cm <= 0.1) return 0;
-  if (cm >= 3000) return 100;
-  const logCm = Math.log(cm);
-  return ((logCm - MIN_LOG) / (MAX_LOG - MIN_LOG)) * 100;
-};
-
-// Format size for display (cm or m)
-const formatSize = (cm: number) => {
-  return `${cm.toFixed(1)}cm`;
-};
-
-// Get scale label based on size
-const getScaleLabel = (val: number) => {
-  const sizeInCm = sliderValueToCm(val);
-
-  if (sizeInCm < 1) return "Microscopic";
-  if (sizeInCm < 50) return "Tiny";
-  if (sizeInCm < 220) return "Human-sized";
-  if (sizeInCm < 1000) return "Large";
-  return "Colossal";
-};
+import {
+  sliderValueToCm,
+  cmToSliderValue,
+  formatSize,
+  getScaleLabel,
+} from "../../lib/scale-calculations";
 
 describe("Scale calculation functions", () => {
   describe("sliderValueToCm", () => {
