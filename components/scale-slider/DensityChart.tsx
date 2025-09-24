@@ -84,7 +84,7 @@ const DensityChart: React.FC<DensityChartProps> = ({
   value,
 }) => {
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full max-w-2xl mb-0">
       <div className="relative w-full h-6 rounded-lg border-2 border-gray-800 shadow-inner bg-black/20">
         {/* Scale indicator lines */}
         {[1, 50, 220, 1000].map((cm) => (
