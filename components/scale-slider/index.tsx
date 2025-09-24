@@ -191,16 +191,14 @@ export function ScaleSlider({
       />
       {/* Tooltip */}
       {showTooltip && (
-        <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 transition-all duration-300 ease-out">
-          <div
-            className="bg-black/30 text-gray-200/70 text-xs font-mono px-2 py-1 rounded shadow-lg border border-gray-900"
-            style={{
-              position: "absolute",
-              left: `calc(${value}% - 18px)`,
-              bottom: "100%",
-              marginBottom: "10px",
-            }}
-          >
+        <div
+          className="absolute -top-8 transition-all duration-300 ease-out pointer-events-none"
+          style={{
+            left: `${value}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          <div className="bg-black/30 text-gray-200/70 text-xs font-mono px-2 py-1 rounded shadow-lg border border-gray-900">
             {valueToSize(value)}
           </div>
         </div>

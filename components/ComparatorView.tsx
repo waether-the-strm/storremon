@@ -12,6 +12,7 @@ import { TinderCardStack } from "./TinderCardStack";
 import { ScaleSlider } from "./scale-slider";
 import { ToggleButtonGroup } from "./ToggleButtonGroup";
 import { useDebounce } from "../hooks/useDebounce";
+import { useLoadingProgress } from "../hooks/useLoadingProgress";
 import { SizeContext } from "./Header";
 import { emptyArtCardProps, emptyPokemonCardProps } from "./empty-card-data";
 import {
@@ -66,6 +67,16 @@ export function ComparatorView({
   const [isArtLoading, setIsArtLoading] = useState(false);
   const context = useContext(SizeContext);
 
+  // Loading progress tracking
+  const pokemonProgress = useLoadingProgress({
+    type: "pokemon",
+    onComplete: () => setIsPokemonLoading(false),
+  });
+  const artProgress = useLoadingProgress({
+    type: "museum",
+    onComplete: () => setIsArtLoading(false),
+  });
+
   useEffect(() => {
     const checkIsMobile = () => {
       const mobile = window.innerWidth < 640;
@@ -89,6 +100,7 @@ export function ComparatorView({
 
       if (showPokemon) {
         setIsPokemonLoading(true);
+        pokemonProgress.startLoading();
         try {
           // Pokemon height is in decimeters, so we convert cm to dm
           const sizeInDm = Math.max(1, Math.floor(sizeInCm / 10));
@@ -100,7 +112,7 @@ export function ComparatorView({
           console.error("Failed to fetch Pokemon data:", error);
           setPokemonData([]); // Clear data on error
         } finally {
-          setIsPokemonLoading(false);
+          pokemonProgress.stopLoading();
         }
       } else {
         setPokemonData([]);
@@ -108,6 +120,7 @@ export function ComparatorView({
 
       if (showArt) {
         setIsArtLoading(true);
+        artProgress.startLoading();
         try {
           const size = Math.round(sizeInCm);
           const response = await fetch(`/api/museum/${size}`);
@@ -118,7 +131,7 @@ export function ComparatorView({
           console.error("Failed to fetch Art data:", error);
           setArtData([]); // Clear data on error
         } finally {
-          setIsArtLoading(false);
+          artProgress.stopLoading();
         }
       } else {
         setArtData([]);
@@ -233,6 +246,16 @@ export function ComparatorView({
             options={toggleOptions}
             activeOptions={activeOptions}
             onToggle={handleToggle}
+            loadingStates={{
+              pokemon: {
+                isLoading: pokemonProgress.isLoading,
+                progress: pokemonProgress.progress,
+              },
+              art: {
+                isLoading: artProgress.isLoading,
+                progress: artProgress.progress,
+              },
+            }}
           />
 
           <p className="text-gray-500 text-center max-w-2xl">

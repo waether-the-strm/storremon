@@ -14,6 +14,7 @@ interface ToggleButtonGroupProps {
   onToggle: (optionId: string) => void;
   className?: string;
   containerClassName?: string;
+  loadingStates?: Record<string, { isLoading: boolean; progress?: number }>;
 }
 
 export function ToggleButtonGroup({
@@ -22,22 +23,32 @@ export function ToggleButtonGroup({
   onToggle,
   className = "",
   containerClassName = "",
+  loadingStates = {},
 }: ToggleButtonGroupProps) {
   return (
     <div
       className={`flex bg-gray-100/10 backdrop-blur-xs rounded-3xl p-3 shadow-inner ${containerClassName}`}
     >
-      {options.map((option, index) => (
-        <ToggleButton
-          key={option.id}
-          isActive={activeOptions.includes(option.id)}
-          onClick={() => onToggle(option.id)}
-          activeColor={option.color}
-          className={`${index > 0 ? "ml-2" : ""} ${className}`}
-        >
-          {option.label}
-        </ToggleButton>
-      ))}
+      {options.map((option, index) => {
+        const loadingState = loadingStates[option.id] || {
+          isLoading: false,
+          progress: 0,
+        };
+
+        return (
+          <ToggleButton
+            key={option.id}
+            isActive={activeOptions.includes(option.id)}
+            onClick={() => onToggle(option.id)}
+            activeColor={option.color}
+            className={`${index > 0 ? "ml-2" : ""} ${className}`}
+            isLoading={loadingState.isLoading}
+            loadingProgress={loadingState.progress}
+          >
+            {option.label}
+          </ToggleButton>
+        );
+      })}
     </div>
   );
 }

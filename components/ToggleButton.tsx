@@ -6,6 +6,8 @@ interface ToggleButtonProps {
   children: React.ReactNode;
   activeColor?: "red" | "blue" | "green" | "purple" | "yellow";
   className?: string;
+  isLoading?: boolean;
+  loadingProgress?: number; // 0-100
 }
 
 const colorClasses = {
@@ -47,17 +49,28 @@ export function ToggleButton({
   children,
   activeColor = "blue",
   className = "",
+  isLoading = false,
+  loadingProgress = 0,
 }: ToggleButtonProps) {
   const colors = colorClasses[activeColor];
 
   return (
     <button
       onClick={onClick}
-      className={`w-24 sm:w-32 px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base rounded-xl transition-all duration-300 cursor-pointer border-2 ${
+      className={`relative w-24 sm:w-32 px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base rounded-xl transition-all duration-300 cursor-pointer border-2 overflow-hidden ${
         isActive ? colors.active : colors.inactive
       } ${className}`}
     >
       {children}
+      {isLoading && (
+        <div
+          className="absolute bottom-0 left-0 h-1 bg-black/50 transition-transform duration-300 ease-out origin-left"
+          style={{
+            width: "100%",
+            transform: `scaleX(${loadingProgress / 100})`,
+          }}
+        />
+      )}
     </button>
   );
 }
