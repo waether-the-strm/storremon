@@ -310,7 +310,7 @@ export function IntroTooltip({ className = "" }: IntroTooltipProps) {
 
                   {/* GitHub link */}
                   <a
-                    href="https://github.com/yourusername/game-app-layout"
+                    href="https://github.com/waether-the-strm/storremon"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors cursor-pointer"
